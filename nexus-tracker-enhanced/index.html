@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self';
+           script-src 'self' 'unsafe-inline';
+           style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+           font-src https://fonts.gstatic.com;
+           connect-src https://api.nexusmods.com;">
+<meta name="author" content="Viable Dahlia">
+<meta name="description" content="A lightweight browser-based tool for searching and exploring your NexusMods tracked mod list">
+<meta property="og:title" content="Nexus Tracker Enhanced - Viable Dahlia">
+<meta property="og:description" content="Browser-based tool for searching and exploring your NexusMods tracked mod list. No install, no account setup, no data stored anywhere.">
+<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools/nexus-tracker-enhanced/index.html">		   
+<title>NEXUS // TRACKER ENHANCED</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+  :root {
+    --green: #39ff14;
+    --green-dim: #1a7a08;
+    --green-glow: rgba(57,255,20,0.15);
+    --green-mid: #7fff5a;
+    --amber: #ffb000;
+    --bg: #050800;
+    --bg2: #090d00;
+    --border: #1e3a0a;
+    --text: #c8f5a0;
+    --text-dim: #5a8a3a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* CRT vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    border: 1px solid var(--green);
+    padding: 18px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 0 20px var(--green-glow), inset 0 0 30px rgba(57,255,20,0.03);
+  }
+
+  .header::before {
+    content: '▌ROBCO INDUSTRIES (TM) UNIFIED OPERATING SYSTEM▐';
+    display: block;
+    color: var(--green-dim);
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .title {
+    font-family: 'VT323', monospace;
+    font-size: 42px;
+    color: var(--green);
+    text-shadow: 0 0 10px var(--green), 0 0 30px rgba(57,255,20,0.4);
+    letter-spacing: 6px;
+    line-height: 1;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-color: var(--green);
+    border-style: solid;
+  }
+  .corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+  /* Panel */
+  .panel {
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    background: var(--bg2);
+    box-shadow: 0 0 8px rgba(57,255,20,0.05);
+  }
+
+  .panel-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--green-dim);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-label::before { content: '//'; color: var(--green); }
+
+  /* API Key area */
+  .key-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"], input[type="password"] {
+    background: rgba(57,255,20,0.04);
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 9px 14px;
+    outline: none;
+    flex: 1;
+    min-width: 200px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    letter-spacing: 1px;
+  }
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 10px var(--green-glow);
+  }
+  input::placeholder { color: var(--green-dim); }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 9px 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: background 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover {
+    background: var(--green-glow);
+    box-shadow: 0 0 14px var(--green-glow);
+  }
+  .btn:active { background: rgba(57,255,20,0.25); }
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-sm {
+    font-size: 11px;
+    padding: 5px 12px;
+    letter-spacing: 1px;
+  }
+
+  /* FO4 quick-filter button */
+  .btn-fo4 {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .btn-fo4:hover {
+    background: rgba(255,176,0,0.1);
+    box-shadow: 0 0 14px rgba(255,176,0,0.2);
+  }
+  .btn-fo4.active {
+    background: rgba(255,176,0,0.15);
+    box-shadow: 0 0 10px rgba(255,176,0,0.2);
+  }
+
+  /* Show removed toggle button */
+  .btn-removed {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+  .btn-removed:hover {
+    background: rgba(255,107,107,0.08);
+    box-shadow: 0 0 14px rgba(255,107,107,0.2);
+  }
+  .btn-removed.active {
+    background: rgba(255,107,107,0.12);
+    box-shadow: 0 0 10px rgba(255,107,107,0.2);
+  }
+
+  /* Removed mod item */
+  .mod-item.is-removed {
+    opacity: 0.55;
+    border-color: rgba(255,107,107,0.25);
+  }
+  .mod-item.is-removed:hover {
+    border-color: rgba(255,107,107,0.5);
+    background: rgba(255,107,107,0.03);
+  }
+  .mod-item.is-removed .mod-name {
+    color: var(--text-dim);
+  }
+
+  .badge-removed {
+    font-size: 10px;
+    border: 1px solid rgba(255,107,107,0.5);
+    color: #ff6b6b;
+    padding: 2px 8px;
+    white-space: nowrap;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .hint a { color: var(--green-dim); text-decoration: underline; }
+
+  /* Search + filters */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .search-row input[type="text"] {
+    flex: 2;
+    min-width: 200px;
+  }
+
+  select {
+    background: rgba(57,255,20,0.04);
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 9px 14px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    flex: 1;
+    min-width: 140px;
+  }
+  select:focus { border-color: var(--green); }
+  select option { background: #0a0f00; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .stat { display: flex; align-items: center; gap: 6px; }
+  .stat-val { color: var(--green); font-size: 13px; }
+
+  /* Progress */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    transition: width 0.3s;
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* Mod list */
+  .mod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mod-item {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: start;
+    transition: border-color 0.15s, background 0.15s;
+    cursor: default;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .mod-item:hover {
+    border-color: var(--green-dim);
+    background: rgba(57,255,20,0.03);
+  }
+
+  .mod-name {
+    font-size: 14px;
+    color: var(--green-mid);
+    letter-spacing: 0.5px;
+    word-break: break-word;
+  }
+
+  .mod-name mark {
+    background: rgba(57,255,20,0.25);
+    color: var(--green);
+    border-radius: 1px;
+  }
+
+  .mod-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  .mod-game-badge {
+    font-size: 10px;
+    border: 1px solid var(--green-dim);
+    color: var(--green-dim);
+    padding: 2px 8px;
+    white-space: nowrap;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .mod-link {
+    font-size: 11px;
+    color: var(--green-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  .mod-link:hover { color: var(--green); }
+
+  /* Status / log */
+  .log {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    min-height: 20px;
+    margin-top: 8px;
+  }
+  .log.ok { color: var(--green); }
+  .log.err { color: #ff6b6b; }
+  .log.warn { color: var(--amber); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--green-dim);
+    font-size: 13px;
+    letter-spacing: 2px;
+    border: 1px dashed var(--border);
+  }
+
+  .blink {
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* Toggle key visibility */
+  .key-wrap { position: relative; flex: 1; }
+  .key-wrap input { width: 100%; }
+  .eye-btn {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--green-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+  }
+
+  .sort-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .sort-btn {
+    background: none; border: none;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    transition: color 0.15s;
+  }
+  .sort-btn:hover, .sort-btn.active { color: var(--green); }
+  .sort-btn.active::after { content: ' ▼'; }
+  .sort-btn.active.asc::after { content: ' ▲'; }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .cursor-blink {
+    display: inline-block;
+    animation: cursorBlink 1s step-end infinite;
+  }
+  @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green-dim); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+  @media (max-width: 600px) {
+    .title { font-size: 30px; }
+    .key-row { flex-direction: column; }
+    .search-row { flex-direction: column; }
+    .footer { flex-direction: column; gap: 6px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="title">NEXUS // TRACKER ENHANCED</div>
+    <div class="subtitle">TRACKED MOD SEARCH TERMINAL &nbsp;|&nbsp; V1.1.0</div>
+  </header>
+
+  <!-- API KEY PANEL -->
+  <div class="panel" id="keyPanel">
+    <div class="panel-label">API AUTHENTICATION</div>
+    <div class="key-row">
+      <div class="key-wrap">
+        <input type="password" id="apiKey" placeholder="ENTER NEXUSMODS API KEY..." autocomplete="off" />
+        <!-- FIX: aria-label added for screen reader accessibility -->
+        <button class="eye-btn" onclick="toggleKey()" aria-label="Toggle API key visibility" title="Toggle visibility">👁</button>
+      </div>
+      <button class="btn" id="fetchBtn" onclick="startFetch()">▶ FETCH MODS</button>
+      <button class="btn btn-sm" id="clearBtn" onclick="clearData()" style="display:none">⟳ RESET</button>
+    </div>
+    <div class="hint">
+      Get your personal API key from <strong>nexusmods.com → Settings → API Keys</strong> (under "Personal API Key").<br>
+      🔒 This page is served over <strong>HTTPS</strong> &nbsp;·&nbsp; Your key is sent <strong>directly to NexusMods only</strong> — nowhere else &nbsp;·&nbsp; It is <strong>not saved</strong> anywhere and disappears when you close this tab.
+    </div>
+    <!-- FIX: aria-live="polite" so screen readers announce status changes -->
+    <div class="log" id="statusLog" aria-live="polite">&nbsp;</div>
+  </div>
+
+  <!-- SEARCH PANEL (hidden until data loaded) -->
+  <div class="panel" id="searchPanel" style="display:none">
+    <div class="panel-label">SEARCH &amp; FILTER</div>
+    <div class="search-row">
+      <!-- FIX: placeholder updated to reflect author search support -->
+      <input type="text" id="searchInput" placeholder="SEARCH MOD NAMES OR AUTHORS..." oninput="applyFilters()" />
+      <select id="gameFilter" onchange="applyFilters()">
+        <option value="">ALL GAMES</option>
+      </select>
+      <button class="btn btn-sm" onclick="document.getElementById('searchInput').value=''; applyFilters()">✕ CLEAR</button>
+    </div>
+
+    <!-- NEW: Fallout 4 quick-filter + show removed toggle -->
+    <div class="sort-row" style="margin-bottom: 12px;">
+      QUICK FILTER:
+      <button class="btn btn-sm btn-fo4" id="fo4FilterBtn" onclick="toggleFO4Filter()">⚡ FALLOUT 4 ONLY</button>
+      <button class="btn btn-sm btn-removed" id="showRemovedBtn" onclick="toggleShowRemoved()">✕ SHOW REMOVED</button>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">SHOWING <span class="stat-val" id="countShown">0</span> of <span class="stat-val" id="countTotal">0</span></div>
+      <div class="stat">GAMES: <span class="stat-val" id="countGames">0</span></div>
+      <div class="stat" id="removedStat" style="display:none">REMOVED: <span class="stat-val" id="countRemoved" style="color:#ff6b6b">0</span></div>
+      <div id="loadingTag" class="stat" style="display:none"><span class="stat-val blink">LOADING...</span></div>
+    </div>
+
+    <div id="progressWrap" style="display:none">
+      <div class="progress-label" id="progressLabel">FETCHING MOD DETAILS...</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="sort-row">
+      SORT BY:
+      <button class="sort-btn active asc" id="sortName" onclick="setSort('name')">NAME</button>
+      <button class="sort-btn" id="sortGame" onclick="setSort('game')">GAME</button>
+    </div>
+
+    <div class="mod-list" id="modList">
+      <div class="empty">NO DATA LOADED</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span id="footerStatus">NO MODS LOADED</span>
+    <span>BY <a href="https://www.nexusmods.com/profile/viabledahlia" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:1px;">VIABLE DAHLIA</a> · CC BY 4.0 · <span class="cursor-blink">█</span></span>
+  </div>
+
+</div>
+
+<script>
+  let allMods = [];
+  let sortField = 'name';
+  let sortAsc = true;
+  let fetching = false;
+  let fo4FilterActive = false;
+  let showRemoved = false;
+
+  function toggleKey() {
+    const inp = document.getElementById('apiKey');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function setLog(msg, cls='') {
+    const el = document.getElementById('statusLog');
+    el.textContent = msg;
+    el.className = 'log ' + cls;
+  }
+
+  function setSort(field) {
+    if (sortField === field) { sortAsc = !sortAsc; }
+    else { sortField = field; sortAsc = true; }
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active','asc'));
+    const btn = document.getElementById('sort' + field.charAt(0).toUpperCase() + field.slice(1));
+    btn.classList.add('active');
+    if (sortAsc) btn.classList.add('asc');
+    applyFilters();
+  }
+
+  // NEW: Fallout 4 quick-filter toggle
+  function toggleFO4Filter() {
+    fo4FilterActive = !fo4FilterActive;
+    const btn = document.getElementById('fo4FilterBtn');
+    btn.classList.toggle('active', fo4FilterActive);
+    // Sync game dropdown to match
+    const sel = document.getElementById('gameFilter');
+    sel.value = fo4FilterActive ? 'fallout4' : '';
+    applyFilters();
+  }
+
+  // NEW: Show/hide removed mods toggle
+  function toggleShowRemoved() {
+    showRemoved = !showRemoved;
+    document.getElementById('showRemovedBtn').classList.toggle('active', showRemoved);
+    document.getElementById('showRemovedBtn').textContent = showRemoved ? '✕ HIDE REMOVED' : '✕ SHOW REMOVED';
+    applyFilters();
+  }
+
+  async function startFetch() {
+    const key = document.getElementById('apiKey').value.trim();
+    if (!key) { setLog('⚠ NO API KEY ENTERED', 'err'); return; }
+    if (fetching) return;
+    fetching = true;
+    allMods = [];
+
+    document.getElementById('fetchBtn').disabled = true;
+    document.getElementById('searchPanel').style.display = 'none';
+
+    setLog('► CONNECTING TO NEXUSMODS API...', '');
+
+    try {
+      const res = await fetch('https://api.nexusmods.com/v1/user/tracked_mods.json', {
+        headers: { apikey: key, Accept: 'application/json' }
+      });
+
+      if (res.status === 401) { setLog('✕ INVALID API KEY — CHECK AND RETRY', 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
+      if (!res.ok) { setLog('✕ API ERROR: ' + res.status + ' ' + res.statusText, 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
+
+      const tracked = await res.json();
+      if (!Array.isArray(tracked) || tracked.length === 0) {
+        setLog('⚠ NO TRACKED MODS FOUND ON THIS ACCOUNT', 'warn');
+        fetching=false; document.getElementById('fetchBtn').disabled=false; return;
+      }
+
+      setLog('✓ FOUND ' + tracked.length + ' TRACKED ENTRIES — FETCHING DETAILS...', 'ok');
+      document.getElementById('searchPanel').style.display = 'block';
+      document.getElementById('loadingTag').style.display = 'flex';
+      document.getElementById('progressWrap').style.display = 'block';
+      document.getElementById('clearBtn').style.display = 'inline-block';
+      document.getElementById('countTotal').textContent = tracked.length;
+
+      // Fetch mod details in batches of 10 with small delay
+      const BATCH = 10;
+      const DELAY = 250; // ms between batches
+
+      for (let i = 0; i < tracked.length; i += BATCH) {
+        const batch = tracked.slice(i, i + BATCH);
+        await Promise.all(batch.map(t => fetchModDetail(t, key)));
+        const pct = Math.min(100, Math.round(((i + BATCH) / tracked.length) * 100));
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = 'FETCHING MOD DETAILS... ' + Math.min(i+BATCH, tracked.length) + ' / ' + tracked.length;
+        applyFilters();
+        if (i + BATCH < tracked.length) await sleep(DELAY);
+      }
+
+      document.getElementById('progressWrap').style.display = 'none';
+      document.getElementById('loadingTag').style.display = 'none';
+      const removedCount = allMods.filter(m => m.removed).length;
+      const loadedMsg = removedCount > 0
+        ? `✓ ${allMods.length} MODS LOADED — ${removedCount} REMOVED`
+        : `✓ ALL ${allMods.length} MODS LOADED SUCCESSFULLY`;
+      setLog(loadedMsg, removedCount > 0 ? 'warn' : 'ok');
+      document.getElementById('footerStatus').textContent = allMods.length + ' MODS LOADED · NEXUSMODS API';
+      applyFilters();
+
+    } catch (e) {
+      setLog('✕ NETWORK ERROR: ' + (e.message || 'UNKNOWN'), 'err');
+    }
+
+    fetching = false;
+    document.getElementById('fetchBtn').disabled = false;
+  }
+
+  // FIX: sanitize mod names before storing to prevent XSS via innerHTML
+  function sanitize(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  async function fetchModDetail(tracked, key) {
+    try {
+      const url = `https://api.nexusmods.com/v1/games/${tracked.domain_name}/mods/${tracked.mod_id}.json`;
+      const r = await fetch(url, { headers: { apikey: key, Accept: 'application/json' } });
+      if (!r.ok) {
+        // Hard failure (network/auth issue) — not flagged as removed
+        allMods.push({
+          id: tracked.mod_id,
+          game: tracked.domain_name,
+          name: '[MOD #' + tracked.mod_id + ']',
+          summary: '', author: '', version: '',
+          url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
+          removed: false
+        });
+        return;
+      }
+      const d = await r.json();
+      // NexusMods returns 200 with available:false for removed/hidden mods
+      const isRemoved = d.available === false;
+      allMods.push({
+        id: d.mod_id || tracked.mod_id,
+        game: tracked.domain_name,
+        name: isRemoved
+          ? '[MOD #' + tracked.mod_id + ']'
+          : sanitize(d.name || ('[MOD #' + tracked.mod_id + ']')),
+        summary: sanitize(d.summary || ''),
+        author: sanitize(d.uploaded_by || ''),
+        version: sanitize(d.version || ''),
+        url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
+        removed: isRemoved
+      });
+    } catch {
+      allMods.push({
+        id: tracked.mod_id,
+        game: tracked.domain_name,
+        name: '[MOD #' + tracked.mod_id + ']',
+        summary: '', author: '', version: '',
+        url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
+        removed: false
+      });
+    }
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    // FIX: read the current game selection BEFORE rebuilding the dropdown
+    const prev = document.getElementById('gameFilter').value;
+
+    // Sync fo4FilterActive state with dropdown
+    fo4FilterActive = (prev === 'fallout4');
+    document.getElementById('fo4FilterBtn').classList.toggle('active', fo4FilterActive);
+
+    // Update game dropdown (exclude removed mods from game list)
+    const games = [...new Set(allMods.filter(m => !m.removed).map(m => m.game))].sort();
+    const sel = document.getElementById('gameFilter');
+    sel.innerHTML = '<option value="">ALL GAMES</option>' + games.map(g => `<option value="${g}"${g===prev?' selected':''}>${formatGame(g)}</option>`).join('');
+    document.getElementById('countGames').textContent = games.length;
+
+    // Update removed count stat
+    const removedCount = allMods.filter(m => m.removed).length;
+    document.getElementById('countRemoved').textContent = removedCount;
+    document.getElementById('removedStat').style.display = removedCount > 0 ? 'flex' : 'none';
+
+    // FIX: filter using `prev` (stable value), not a re-read of the rebuilt dropdown
+    // FIX: also search by author, not just name
+    let filtered = allMods.filter(m => {
+      if (m.removed && !showRemoved) return false;
+      if (!m.removed && prev && m.game !== prev) return false;
+      if (q && !m.name.toLowerCase().includes(q) && !m.author.toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    // Sort — removed mods always sort to the bottom
+    filtered.sort((a, b) => {
+      if (a.removed !== b.removed) return a.removed ? 1 : -1;
+      let va = sortField === 'game' ? a.game : a.name.toLowerCase();
+      let vb = sortField === 'game' ? b.game : b.name.toLowerCase();
+      if (va < vb) return sortAsc ? -1 : 1;
+      if (va > vb) return sortAsc ? 1 : -1;
+      return 0;
+    });
+
+    document.getElementById('countShown').textContent = filtered.length;
+    // FIX: countTotal shows active (non-removed) mods only
+    document.getElementById('countTotal').textContent = allMods.filter(m => !m.removed).length;
+
+    const list = document.getElementById('modList');
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty">${allMods.length === 0 ? 'NO DATA LOADED' : 'NO MODS MATCH CURRENT FILTERS'}</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(m => {
+      // Highlight matches in name and author
+      const nameHtml = q ? m.name.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.name;
+      const authorHtml = q && m.author ? m.author.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.author;
+      const meta = [authorHtml ? 'BY: ' + authorHtml : '', m.version ? 'v' + m.version : ''].filter(Boolean).join('  ·  ');
+      const rightBadge = m.removed
+        ? `<div class="badge-removed">REMOVED</div>`
+        : `<div class="mod-game-badge">${formatGame(m.game)}</div>`;
+      return `
+        <div class="mod-item${m.removed ? ' is-removed' : ''}">
+          <div>
+            <div class="mod-name">${nameHtml}</div>
+            ${meta ? `<div class="mod-meta">${meta}</div>` : ''}
+            ${m.url ? `<a class="mod-link" href="${m.url}" target="_blank" rel="noopener">↗ ${m.removed ? 'VIEW ON NEXUSMODS · UNTRACK THIS MOD' : 'VIEW ON NEXUSMODS'}</a>` : ''}
+          </div>
+          ${rightBadge}
+        </div>`;
+    }).join('');
+  }
+
+  function formatGame(domain) {
+    const map = {
+      fallout4: 'FALLOUT 4', fallout3: 'FALLOUT 3', falloutnv: 'NEW VEGAS',
+      fallout76: 'FALLOUT 76', skyrim: 'SKYRIM LE', skyrimspecialedition: 'SKYRIM SE',
+      oblivion: 'OBLIVION', morrowind: 'MORROWIND', starfield: 'STARFIELD',
+      witcher3: 'WITCHER 3', cyberpunk2077: 'CYBERPUNK 2077',
+    };
+    // Fallback handles: hyphens, underscores, camelCase, and plain lowercase domains
+    return map[domain] || domain
+      .replace(/[-_]+/g, ' ')               // hyphens/underscores to spaces
+      .replace(/([a-z])([A-Z])/g, '$1 $2')  // camelCase to spaces
+      .replace(/([a-zA-Z])(\d)/g, '$1 $2')  // letters then numbers to spaces
+      .replace(/(\d)([a-zA-Z])/g, '$1 $2')  // numbers then letters to spaces
+      .trim()
+      .toUpperCase();
+  }
+
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function clearData() {
+    allMods = [];
+    // FIX: reset fetching flag so a stuck/errored fetch doesn't block reset
+    fetching = false;
+    fo4FilterActive = false;
+    showRemoved = false;
+    document.getElementById('fo4FilterBtn').classList.remove('active');
+    document.getElementById('showRemovedBtn').classList.remove('active');
+    document.getElementById('showRemovedBtn').textContent = '✕ SHOW REMOVED';
+    document.getElementById('removedStat').style.display = 'none';
+    document.getElementById('searchPanel').style.display = 'none';
+    document.getElementById('clearBtn').style.display = 'none';
+    document.getElementById('apiKey').value = '';
+    document.getElementById('fetchBtn').disabled = false;
+    document.getElementById('footerStatus').textContent = 'NO MODS LOADED';
+    setLog('► READY', '');
+  }
+</script>
+</body>
+</html>
