@@ -636,7 +636,12 @@
 
     try {
       const res = await fetch('https://api.nexusmods.com/v1/user/tracked_mods.json', {
-        headers: { apikey: key, Accept: 'application/json' }
+        headers: {
+          apikey: key,
+          Accept: 'application/json',
+          'Application-Name': 'CommonwealthTools-NexusTrackerEnhanced',
+          'Application-Version': '1.1.0'
+        }
       });
 
       if (res.status === 401) { setLog('✕ INVALID API KEY — CHECK AND RETRY', 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
@@ -695,7 +700,14 @@
   async function fetchModDetail(tracked, key) {
     try {
       const url = `https://api.nexusmods.com/v1/games/${tracked.domain_name}/mods/${tracked.mod_id}.json`;
-      const r = await fetch(url, { headers: { apikey: key, Accept: 'application/json' } });
+      const r = await fetch(url, {
+        headers: {
+          apikey: key,
+          Accept: 'application/json',
+          'Application-Name': 'CommonwealthTools-NexusTrackerEnhanced',
+          'Application-Version': '1.1.0'
+        }
+      });
       if (!r.ok) {
         // Hard failure (network/auth issue) — not flagged as removed
         allMods.push({
