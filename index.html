@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Viable Dahlia">
+<meta name="description" content="Commonwealth Tools - browser-based utilities for Fallout 4 modders. No install, no data sent anywhere.">
+<meta property="og:title" content="Commonwealth Tools - Viable Dahlia">
+<meta property="og:description" content="Lightweight browser-based tools for Fallout 4 modders. No install, no account, no data sent anywhere.">
+<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools/">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self';
+           script-src 'self' 'unsafe-inline';
+           style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+           font-src https://fonts.gstatic.com;">
+<title>COMMONWEALTH TOOLS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+  :root {
+    --green: #39ff14;
+    --green-dim: #1a7a08;
+    --green-glow: rgba(57,255,20,0.15);
+    --green-mid: #7fff5a;
+    --amber: #ffb000;
+    --bg: #050800;
+    --bg2: #090d00;
+    --border: #1e3a0a;
+    --text: #c8f5a0;
+    --text-dim: #5a8a3a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 20px;
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* CRT vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- HEADER --- */
+  .header {
+    border: 1px solid var(--green);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    box-shadow: 0 0 24px var(--green-glow), inset 0 0 40px rgba(57,255,20,0.03);
+  }
+
+  .header::before {
+    content: '▌ROBCO INDUSTRIES (TM) UNIFIED OPERATING SYSTEM▐';
+    display: block;
+    color: var(--green-dim);
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: var(--green);
+    border-style: solid;
+  }
+  .corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+  .title {
+    font-family: 'VT323', monospace;
+    font-size: 52px;
+    color: var(--green);
+    text-shadow: 0 0 12px var(--green), 0 0 40px rgba(57,255,20,0.4);
+    letter-spacing: 6px;
+    line-height: 1;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-top: 6px;
+  }
+
+  /* --- INTRO PANEL --- */
+  .intro {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    line-height: 1.8;
+    box-shadow: 0 0 8px rgba(57,255,20,0.04);
+  }
+
+  .intro strong {
+    color: var(--green-mid);
+    font-weight: normal;
+  }
+
+  .intro::before {
+    content: '// SYSTEM DESCRIPTION';
+    display: block;
+    color: var(--green-dim);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  /* --- TOOLS SECTION --- */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--green-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .tools-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+
+  /* --- TOOL CARD --- */
+  .tool-card {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    overflow: hidden;
+  }
+
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(57,255,20,0.03) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .tool-card:hover {
+    border-color: var(--green-dim);
+    box-shadow: 0 0 16px var(--green-glow);
+    background: rgba(9,13,0,0.95);
+  }
+
+  .tool-card:hover::before { opacity: 1; }
+
+  .tool-card:focus-visible {
+    outline: 1px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  .tool-index {
+    font-family: 'VT323', monospace;
+    font-size: 32px;
+    color: var(--green-dim);
+    position: absolute;
+    top: 12px;
+    right: 72px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .tool-card:hover .tool-index { color: var(--green); }
+
+  .tool-name {
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    color: var(--green);
+    letter-spacing: 3px;
+    line-height: 1.1;
+    text-shadow: 0 0 8px rgba(57,255,20,0.3);
+    margin-bottom: 6px;
+    transition: text-shadow 0.2s;
+  }
+
+  .tool-card:hover .tool-name {
+    text-shadow: 0 0 14px rgba(57,255,20,0.6);
+  }
+
+  .tool-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    line-height: 1.7;
+    max-width: 580px;
+  }
+
+  .tool-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .tag {
+    font-size: 10px;
+    border: 1px solid var(--green-dim);
+    color: var(--green-dim);
+    padding: 1px 8px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .tool-card:hover .tag {
+    border-color: rgba(57,255,20,0.4);
+    color: var(--text-dim);
+  }
+
+  .tool-arrow {
+    font-size: 22px;
+    color: var(--green-dim);
+    padding-right: 4px;
+    transition: color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .tool-card:hover .tool-arrow {
+    color: var(--green);
+    transform: translateX(4px);
+  }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .footer a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer a:hover { color: var(--green); }
+
+  .cursor-blink {
+    display: inline-block;
+    animation: cursorBlink 1s step-end infinite;
+  }
+  @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green-dim); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+  @media (max-width: 600px) {
+    .title { font-size: 36px; }
+    .tool-card { grid-template-columns: 1fr; }
+    .tool-arrow { display: none; }
+    .tool-index { display: none; }
+    .footer { flex-direction: column; gap: 6px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="title">COMMONWEALTH TOOLS</div>
+    <div class="subtitle">BROWSER-BASED UTILITIES FOR FALLOUT 4 MODDERS</div>
+  </header>
+
+  <div class="intro">
+    A collection of lightweight tools built for <strong>Fallout 4 settlement builders and modders</strong>.
+    No installs. No accounts. No data sent anywhere except where you choose.
+    Everything runs locally in your browser.
+  </div>
+
+  <div class="section-label">// AVAILABLE TOOLS</div>
+
+  <div class="tools-grid">
+
+    <a class="tool-card" href="./mo2-modlist/" aria-label="Open MO2 Mod List Reader">
+      <div class="tool-index">01</div>
+      <div>
+        <div class="tool-name">MO2 // MOD LIST READER</div>
+        <div class="tool-desc">
+          Read and explore your Mod Organizer 2 mod list directly in the browser.
+          Drag in your <code style="color:var(--amber);background:rgba(255,176,0,0.08);padding:1px 5px;border:1px solid rgba(255,176,0,0.2)">modlist.txt</code>
+          to search, filter, and sort your full mod list by name, priority, or status.
+        </div>
+        <div class="tool-tags">
+          <span class="tag">MO2</span>
+          <span class="tag">MOD LIST</span>
+          <span class="tag">FALLOUT 4</span>
+          <span class="tag">NO API KEY</span>
+        </div>
+      </div>
+      <div class="tool-arrow">▶</div>
+    </a>
+
+    <a class="tool-card" href="./nexus-tracker-enhanced/" aria-label="Open Nexus Tracker Enhanced">
+      <div class="tool-index">02</div>
+      <div>
+        <div class="tool-name">NEXUS // TRACKER ENHANCED</div>
+        <div class="tool-desc">
+          Browse your full NexusMods tracked mod list in the browser. Connect with your
+          personal API key to search by name or author, filter by game, and jump straight
+          to Fallout 4 with one click.
+        </div>
+        <div class="tool-tags">
+          <span class="tag">NEXUSMODS</span>
+          <span class="tag">TRACKED MODS</span>
+          <span class="tag">FALLOUT 4</span>
+          <span class="tag">API KEY REQUIRED</span>
+        </div>
+      </div>
+      <div class="tool-arrow">▶</div>
+    </a>
+
+  </div>
+
+  <footer class="footer">
+    <span>COMMONWEALTH TOOLS · V1.0.0</span>
+    <span>BY <a href="https://www.nexusmods.com/profile/viabledahlia" target="_blank" rel="noopener">VIABLE DAHLIA</a> · CC BY 4.0 · <span class="cursor-blink">█</span></span>
+  </footer>
+
+</div>
+</body>
+</html>
