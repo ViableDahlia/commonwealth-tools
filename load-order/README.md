@@ -1,6 +1,6 @@
 # Viable Dahlia's Load Order
 
-Hello, I'm Dahlia <img src="assets/viable-dahlia-avatar.png" width="20" height="20" alt="Viable Dahlia avatar" style="border-radius: 50%;" />
+Hello, I'm Dahlia <img src="../assets/viable-dahlia-avatar.png" width="20" height="20" alt="Viable Dahlia avatar" style="border-radius: 50%;" />
 
 Here you'll find the mods behind every [Fallout 4 Anniversary Edition](https://fallout.bethesda.net/en/games/fallout-4/welcome-home) (AE) build on my channel - 🎮[ViableDahlia](https://www.youtube.com/@ViableDahlia) 🎮 (all about architectural settlement building.) <sup>AE = 1.11.191 for my nerds</sup>
 
