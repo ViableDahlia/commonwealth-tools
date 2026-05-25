@@ -145,6 +145,13 @@ Okay, enough preamble. Allons-y!
       <td></td>
       <td></td>
     </tr>
+    <tr>
+      <!-- Rowspan groups the next row under Modding Tools -->
+      <td colspan="1" rowspan="1">Modding Tools</td>
+      <td>FO4Edit</td>
+      <td></td>
+      <td><i>Mod for XEdit backups</i></td>
+    </tr>	
     <!-- A ROW SPANNING MULTIPLE COLUMNS -->
     <tr>
       <td colspan="4" style="text-align: center;">
@@ -316,7 +323,7 @@ Okay, enough preamble. Allons-y!
     </tr>
     <tr>
       <!-- Rowspan groups the next x rows under Minor Fixes -->
-      <td colspan="1" rowspan="2">Minor Fixes</td>
+      <td colspan="1" rowspan="11">Minor Fixes</td>
       <td><a href="https://www.nexusmods.com/fallout4/mods/80005">Moon Rotation Fix</a></td>
       <td></td>
       <td></td>
@@ -327,7 +334,52 @@ Okay, enough preamble. Allons-y!
       <td>MidnightCultFix.esp</td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">Core Game Fixes & Frameworks</td>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/36205">General Atomics Galleria Speaking Guard Gutsy Voice Fix</a></td>
+      <td>200</td>
+      <td>GeneralAtomicsMrGutsyGuards.esp</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/67185?tab=files">GA Galleria Gutsy Voice Fix - UFO4P Patch</a></td>
+      <td>201</td>
+      <td>GA Galleria Gutsy Voice Fix - UFO4P Patch.esp</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/98544">Motion Vector Fixes</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/27479">Crafting Highlight Fix</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/83706">Workshop Highlight Fix</a></td>
+      <td>202</td>
+      <td>Workshop Highlight Fix.esp</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/84440">Assorted Modular Tweaks</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/26163">Unlimited Survival Mode</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/64426">Remove Ammo from Dropped Guns</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.nexusmods.com/fallout4/mods/11838">Less Annoying Berry Mentats</a></td>
+      <td>203</td>
+      <td>Less Annoying Berry Mentats.esp</td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">Core Game Fixes & Frameworks - Load Last</td>
       <td><a href="https://www.nexusmods.com/fallout4/mods/60074">Previsibines Repair Pack Stable Branch</a> (PRP)</td>
       <td>259</td>
       <td>prp.esm</td>
