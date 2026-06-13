@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Viable Dahlia">
+<meta name="description" content="xEdit Conflict Analyser - Visualise plugin conflicts in your Fallout 4 load order">
+<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools/conflict-analyzer/index.html">
+<title>XEDIT // CONFLICT ANALYSER // BETA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+:root {
+--green: #39ff14;
+--green-dim: #1a7a08;
+--green-glow: rgba(57,255,20,0.15);
+--green-mid: #7fff5a;
+--amber: #ffb000;
+--red: #ff4444;
+--bg: #050800;
+--bg2: #090d00;
+--border: #1e3a0a;
+--text: #c8f5a0;
+--text-dim: #5a8a3a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(--bg);
+color: var(--text);
+font-family: 'Share Tech Mono', monospace;
+min-height: 100vh;
+padding: 24px 20px;
+position: relative;
+overflow-x: hidden;
+}
+
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+background: repeating-linear-gradient(
+0deg, transparent, transparent 2px,
+rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+);
+pointer-events: none;
+z-index: 1000;
+}
+
+body::after {
+content: '';
+position: fixed;
+inset: 0;
+background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.65) 100%);
+pointer-events: none;
+z-index: 999;
+}
+
+.container { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* --- HEADER --- */
+.header {
+border: 1px solid var(--green);
+padding: 18px 24px;
+margin-bottom: 20px;
+box-shadow: 0 0 20px var(--green-glow), inset 0 0 30px rgba(57,255,20,0.03);
+}
+
+.header::before {
+content: '▌ROBCO INDUSTRIES (TM) UNIFIED OPERATING SYSTEM▐';
+display: block;
+color: var(--green-dim);
+font-size: 11px;
+letter-spacing: 2px;
+margin-bottom: 6px;
+}
+
+.title {
+font-family: 'VT323', monospace;
+font-size: 42px;
+color: var(--green);
+text-shadow: 0 0 20px rgba(57,255,20,0.6);
+letter-spacing: 4px;
+line-height: 1;
+}
+
+.subtitle {
+color: var(--text-dim);
+font-size: 11px;
+letter-spacing: 2px;
+margin-top: 4px;
+}
+
+/* --- DROP ZONE --- */
+.drop-section {
+border: 2px dashed var(--green-dim);
+padding: 40px 24px;
+text-align: center;
+margin-bottom: 20px;
+transition: all 0.3s;
+cursor: pointer;
+position: relative;
+}
+
+.drop-section:hover,
+.drop-section.drag-over {
+border-color: var(--green);
+background: rgba(57,255,20,0.04);
+box-shadow: 0 0 20px var(--green-glow);
+}
+
+.drop-icon {
+font-family: 'VT323', monospace;
+font-size: 48px;
+color: var(--green-dim);
+display: block;
+margin-bottom: 8px;
+}
+
+.drop-title {
+font-family: 'VT323', monospace;
+font-size: 26px;
+color: var(--green);
+letter-spacing: 3px;
+margin-bottom: 8px;
+}
+
+.drop-sub {
+color: var(--text-dim);
+font-size: 12px;
+letter-spacing: 1px;
+line-height: 1.8;
+}
+
+.drop-sub code {
+color: var(--amber);
+background: rgba(255,176,0,0.1);
+padding: 1px 6px;
+border: 1px solid rgba(255,176,0,0.3);
+}
+
+#fileInput { display: none; }
+
+.browse-btn {
+display: inline-block;
+margin-top: 16px;
+padding: 8px 20px;
+border: 1px solid var(--green);
+color: var(--green);
+font-family: 'Share Tech Mono', monospace;
+font-size: 12px;
+letter-spacing: 2px;
+cursor: pointer;
+background: transparent;
+transition: all 0.2s;
+}
+
+.browse-btn:hover { background: var(--green-glow); box-shadow: 0 0 10px var(--green-glow); }
+
+/* --- STATS BAR --- */
+.stats-bar {
+display: none;
+grid-template-columns: repeat(3, 1fr);
+gap: 12px;
+margin-bottom: 20px;
+}
+
+.stat-card {
+border: 1px solid var(--border);
+padding: 14px 16px;
+text-align: center;
+position: relative;
+overflow: hidden;
+}
+
+.stat-card::before {
+content: '';
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(57,255,20,0.03) 0%, transparent 60%);
+}
+
+.stat-value {
+font-family: 'VT323', monospace;
+font-size: 36px;
+color: var(--green);
+text-shadow: 0 0 10px rgba(57,255,20,0.5);
+display: block;
+line-height: 1;
+}
+
+.stat-label {
+font-size: 10px;
+letter-spacing: 2px;
+color: var(--text-dim);
+margin-top: 4px;
+display: block;
+}
+
+/* --- CONTROLS --- */
+.controls {
+display: none;
+gap: 10px;
+margin-bottom: 16px;
+flex-wrap: wrap;
+align-items: center;
+}
+
+.search-wrap {
+flex: 1;
+min-width: 200px;
+position: relative;
+}
+
+.search-wrap::before {
+content: '▶';
+position: absolute;
+left: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: var(--green-dim);
+font-size: 12px;
+}
+
+input[type="text"] {
+width: 100%;
+background: var(--bg2);
+border: 1px solid var(--border);
+color: var(--text);
+font-family: 'Share Tech Mono', monospace;
+font-size: 13px;
+padding: 10px 12px 10px 32px;
+outline: none;
+transition: all 0.2s;
+letter-spacing: 1px;
+}
+
+input[type="text"]:focus {
+border-color: var(--green);
+box-shadow: 0 0 10px var(--green-glow);
+}
+
+input[type="text"]::placeholder { color: var(--text-dim); }
+
+.reset-btn {
+padding: 10px 14px;
+border: 1px solid var(--amber);
+background: transparent;
+color: var(--amber);
+font-family: 'Share Tech Mono', monospace;
+font-size: 11px;
+letter-spacing: 1px;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.reset-btn:hover { background: rgba(255,176,0,0.08); box-shadow: 0 0 8px rgba(255,176,0,0.3); }
+
+/* --- RESULTS INFO --- */
+.results-info {
+display: none;
+color: var(--text-dim);
+font-size: 11px;
+letter-spacing: 1px;
+margin-bottom: 10px;
+padding: 0 4px;
+}
+
+.results-info span { color: var(--green); }
+
+/* --- LEGEND --- */
+.legend {
+display: none;
+border: 1px solid var(--border);
+padding: 12px 16px;
+margin-bottom: 16px;
+font-size: 11px;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.legend-item {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.legend-badge {
+display: inline-block;
+padding: 3px 8px;
+border: 1px solid;
+font-size: 10px;
+letter-spacing: 1px;
+}
+
+.legend-winning { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.08); }
+.legend-losing { color: var(--amber); border-color: var(--amber); background: rgba(255,176,0,0.08); }
+
+/* --- CONFLICT LIST --- */
+.conflict-list { display: none; }
+
+.record-group {
+border: 1px solid var(--border);
+margin-bottom: 12px;
+}
+
+.record-header {
+background: rgba(57,255,20,0.05);
+border-bottom: 1px solid var(--border);
+padding: 10px 16px;
+display: flex;
+align-items: center;
+gap: 12px;
+cursor: pointer;
+user-select: none;
+transition: all 0.2s;
+}
+
+.record-header:hover {
+background: rgba(57,255,20,0.08);
+}
+
+.record-toggle {
+font-size: 16px;
+color: var(--green-dim);
+transition: transform 0.2s;
+width: 20px;
+text-align: center;
+}
+
+.record-toggle.open { transform: rotate(90deg); }
+
+.record-id {
+font-family: 'VT323', monospace;
+font-size: 14px;
+color: var(--green);
+text-shadow: 0 0 8px rgba(57,255,20,0.4);
+}
+
+.record-count {
+color: var(--text-dim);
+font-size: 11px;
+margin-left: auto;
+}
+
+.conflicts-container {
+display: none;
+padding: 12px 0;
+}
+
+.conflict-row {
+display: grid;
+grid-template-columns: 48px 160px 1fr auto;
+gap: 16px;
+padding: 10px 16px;
+border-bottom: 1px solid rgba(30,58,10,0.5);
+align-items: flex-start;
+font-size: 12px;
+animation: rowIn 0.2s ease both;
+}
+
+@keyframes rowIn {
+from { opacity: 0; transform: translateX(-8px); }
+to { opacity: 1; transform: translateX(0); }
+}
+
+.conflict-row:last-child { border-bottom: none; }
+
+.conflict-position {
+color: var(--text-dim);
+font-size: 10px;
+letter-spacing: 1px;
+}
+
+.conflict-plugin {
+color: var(--green-mid);
+word-break: break-word;
+font-weight: 500;
+}
+
+.conflict-field {
+color: var(--text-dim);
+font-size: 11px;
+font-style: italic;
+margin-bottom: 4px;
+}
+
+.conflict-value {
+background: var(--bg2);
+border: 1px solid var(--border);
+padding: 8px;
+border-radius: 2px;
+white-space: pre-wrap;
+word-wrap: break-word;
+word-break: break-all;
+max-height: 120px;
+overflow-y: auto;
+line-height: 1.4;
+}
+
+.status-badge {
+display: inline-block;
+padding: 3px 8px;
+border: 1px solid;
+font-size: 10px;
+letter-spacing: 1px;
+white-space: nowrap;
+}
+
+.badge-winning { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.08); }
+.badge-losing { color: var(--amber); border-color: var(--amber); background: rgba(255,176,0,0.08); }
+
+/* --- EMPTY STATE --- */
+.empty-state {
+display: none;
+text-align: center;
+padding: 48px;
+color: var(--text-dim);
+border: 1px solid var(--border);
+}
+
+.empty-icon {
+font-family: 'VT323', monospace;
+font-size: 40px;
+display: block;
+margin-bottom: 8px;
+}
+
+/* --- FOOTER --- */
+.footer {
+margin-top: 20px;
+padding-top: 12px;
+border-top: 1px solid var(--border);
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 10px;
+color: var(--text-dim);
+letter-spacing: 1px;
+}
+
+.cursor-blink {
+display: inline-block;
+animation: blink 1s step-end infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); }
+::-webkit-scrollbar-thumb:hover { background: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+<div class="title">XEDIT // CONFLICTS</div>
+<div class="subtitle">CONFLICT ANALYSER · LOAD ORDER VISUALISER · FALLOUT 4</div>
+</div>
+
+<!-- DROP ZONE -->
+<div class="drop-section" id="dropZone">
+<span class="drop-icon">📋</span>
+<div class="drop-title">DROP TSV FILE HERE</div>
+<div class="drop-sub">
+Drag &amp; drop your xEdit conflict export onto this panel<br>
+or click to browse for it<br><br>
+Expected format: <code>Isolated_Conflicts_Only.txt</code><br>
+(Tab-separated: FormID, Plugin, Path, Master Value, Overriding Value)
+</div>
+<button class="browse-btn" onclick="document.getElementById('fileInput').click()">▶ BROWSE FILE</button>
+<input type="file" id="fileInput" accept=".txt">
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar">
+<div class="stat-card">
+<span class="stat-value" id="statConflicts">0</span>
+<span class="stat-label">TRUE CONFLICTS</span>
+</div>
+<div class="stat-card">
+<span class="stat-value" id="statRecords">0</span>
+<span class="stat-label">AFFECTED RECORDS</span>
+</div>
+<div class="stat-card">
+<span class="stat-value" id="statPairs">0</span>
+<span class="stat-label">PLUGIN PAIRS</span>
+</div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls" id="controls">
+<div class="search-wrap">
+<input type="text" id="searchInput" placeholder="SEARCH FORMID...">
+</div>
+<button class="reset-btn" onclick="resetTool()">✕ RESET</button>
+</div>
+
+<!-- RESULTS INFO -->
+<div class="results-info" id="resultsInfo">
+Showing <span id="resultCount">0</span> real conflicts
+</div>
+
+<!-- LEGEND -->
+<div class="legend" id="legend">
+<div class="legend-item">
+<span class="legend-badge legend-winning">WINNING</span>
+<span>Plugin loads last (takes precedence)</span>
+</div>
+<div class="legend-item">
+<span class="legend-badge legend-losing">LOSING</span>
+<span>Plugin loads earlier (overridden)</span>
+</div>
+</div>
+
+<!-- CONFLICT LIST -->
+<div class="conflict-list" id="conflictList"></div>
+
+<!-- EMPTY STATE -->
+<div class="empty-state" id="emptyState">
+<span class="empty-icon">◈</span>
+NO REAL CONFLICTS FOUND (ONLY [MISSING] ENTRIES)
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+<span id="footerFile">NO FILE LOADED</span>
+<span>BY <a href="https://www.nexusmods.com/profile/viabledahlia" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:1px;">VIABLE DAHLIA</a> · CC BY 4.0 · <span class="cursor-blink">█</span></span>
+</div>
+
+</div>
+
+<script>
+let allConflicts = [];
+let pluginLoadOrder = {};
+
+// --- FILE HANDLING ---
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => {
+e.preventDefault();
+dropZone.classList.add('drag-over');
+});
+
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+dropZone.addEventListener('drop', e => {
+e.preventDefault();
+dropZone.classList.remove('drag-over');
+const file = e.dataTransfer.files[0];
+if (file) processFile(file);
+});
+
+fileInput.addEventListener('change', e => {
+const file = e.target.files[0];
+if (file) processFile(file);
+});
+
+function processFile(file) {
+const reader = new FileReader();
+reader.onload = e => parseTSV(e.target.result, file.name);
+reader.readAsText(file);
+}
+
+// --- PARSE TSV ---
+function parseTSV(text, filename) {
+const lines = text.split(/\r?\n/);
+const headers = lines[0].split('\t');
+
+const rawData = [];
+const pluginsSeen = [];
+
+for (let i = 1; i < lines.length; i++) {
+const line = lines[i].trim();
+if (!line) continue;
+
+const parts = line.split('\t');
+if (parts.length < 5) continue;
+
+const plugin = parts[1].trim();
+if (!pluginsSeen.includes(plugin)) {
+pluginsSeen.push(plugin);
+}
+
+rawData.push({
+formid: parts[0].trim(),
+plugin: plugin,
+path: parts[2].trim(),
+masterValue: parts[3].trim().replace(/^"(.*)"$/s, '$1'),
+overridingValue: parts[4].trim().replace(/^"(.*)"$/s, '$1')
+});
+}
+
+pluginLoadOrder = {};
+pluginsSeen.forEach((p, i) => {
+pluginLoadOrder[p] = i;
+});
+
+analyseConflicts(rawData, filename);
+}
+
+// --- ANALYSE ---
+function analyseConflicts(rawData, filename) {
+const byRecordField = {};
+
+rawData.forEach(r => {
+if (r.overridingValue === '[missing]') return;
+
+const key = r.formid + '|' + r.path;
+if (!byRecordField[key]) {
+byRecordField[key] = { formid: r.formid, path: r.path, values: {}, lastPlugin: null };
+}
+byRecordField[key].values[r.plugin] = r.overridingValue;
+byRecordField[key].lastPlugin = r.plugin;
+});
+
+allConflicts = [];
+Object.values(byRecordField).forEach(field => {
+const plugins = Object.keys(field.values);
+const uniqueValues = [...new Set(Object.values(field.values))];
+
+if (uniqueValues.length > 1) {
+allConflicts.push({
+formid: field.formid,
+path: field.path,
+pluginValues: field.values,
+winningPlugin: field.lastPlugin
+});
+}
+});
+
+document.getElementById('footerFile').textContent = `FILE: ${filename} · ${allConflicts.length} TRUE CONFLICTS FOUND`;
+updateStats();
+showUI();
+renderConflicts();
+}
+
+function updateStats() {
+const uniqueRecords = new Set(allConflicts.map(c => c.formid)).size;
+const pluginPairs = new Set();
+
+allConflicts.forEach(c => {
+const plugins = Object.keys(c.pluginValues).sort((a, b) => pluginLoadOrder[a] - pluginLoadOrder[b]);
+for (let i = 0; i < plugins.length; i++) {
+for (let j = i + 1; j < plugins.length; j++) {
+pluginPairs.add(plugins[i] + ' ↔ ' + plugins[j]);
+}
+}
+});
+
+document.getElementById('statConflicts').textContent = allConflicts.length;
+document.getElementById('statRecords').textContent = uniqueRecords;
+document.getElementById('statPairs').textContent = pluginPairs.size;
+}
+
+function showUI() {
+document.getElementById('dropZone').style.display = 'none';
+document.getElementById('statsBar').style.display = 'grid';
+document.getElementById('controls').style.display = 'flex';
+document.getElementById('resultsInfo').style.display = 'block';
+document.getElementById('legend').style.display = 'flex';
+document.getElementById('conflictList').style.display = 'block';
+}
+
+function resetTool() {
+allConflicts = [];
+pluginLoadOrder = {};
+document.getElementById('searchInput').value = '';
+document.getElementById('footerFile').textContent = 'NO FILE LOADED';
+document.getElementById('fileInput').value = '';
+document.getElementById('dropZone').style.display = 'block';
+document.getElementById('statsBar').style.display = 'none';
+document.getElementById('controls').style.display = 'none';
+document.getElementById('resultsInfo').style.display = 'none';
+document.getElementById('legend').style.display = 'none';
+document.getElementById('conflictList').style.display = 'none';
+document.getElementById('emptyState').style.display = 'none';
+}
+
+// --- SEARCH & RENDER ---
+document.getElementById('searchInput').addEventListener('input', renderConflicts);
+
+function renderConflicts() {
+const query = document.getElementById('searchInput').value.toLowerCase().trim();
+const filtered = allConflicts.filter(c => c.formid.toLowerCase().includes(query));
+
+document.getElementById('resultCount').textContent = filtered.length;
+
+if (filtered.length === 0) {
+document.getElementById('conflictList').style.display = 'none';
+document.getElementById('emptyState').style.display = 'block';
+return;
+}
+
+document.getElementById('emptyState').style.display = 'none';
+
+const byRecord = {};
+filtered.forEach(c => {
+if (!byRecord[c.formid]) byRecord[c.formid] = [];
+byRecord[c.formid].push(c);
+});
+
+let html = '';
+Object.keys(byRecord).sort().forEach(formid => {
+const conflicts = byRecord[formid];
+const recordId = 'record-' + formid;
+
+html += `
+<div class="record-group">
+<div class="record-header" onclick="toggleRecord('${recordId}')">
+<span class="record-toggle" id="${recordId}-toggle">▶</span>
+<span class="record-id">${formid}</span>
+<span class="record-count">${conflicts.length} field${conflicts.length !== 1 ? 's' : ''}</span>
+</div>
+<div class="conflicts-container" id="${recordId}">
+${conflicts.map(c => {
+const plugins = Object.keys(c.pluginValues).sort((a, b) => pluginLoadOrder[a] - pluginLoadOrder[b]);
+return `
+<div style="border-bottom: 1px solid rgba(30,58,10,0.5); padding: 12px 16px;">
+<div class="conflict-field">${c.path}</div>
+${plugins.map((p, idx) => {
+const isWinning = p === c.winningPlugin;
+const statusBadge = isWinning ? 'badge-winning' : 'badge-losing';
+const statusText = isWinning ? 'WINNING' : 'LOSING';
+const pos = pluginLoadOrder[p];
+return `
+<div class="conflict-row">
+<div class="conflict-position">#${pos + 1}</div>
+<div class="conflict-plugin">${p}</div>
+<div class="conflict-value">${escapeHtml(c.pluginValues[p])}</div>
+<span class="status-badge ${statusBadge}">${statusText}</span>
+</div>
+`;
+}).join('')}
+</div>
+`;
+}).join('')}
+</div>
+</div>
+`;
+});
+
+document.getElementById('conflictList').innerHTML = html;
+}
+
+function toggleRecord(id) {
+const container = document.getElementById(id);
+const toggle = document.getElementById(id + '-toggle');
+const isHidden = container.style.display === 'none';
+container.style.display = isHidden ? 'block' : 'none';
+toggle.style.transform = isHidden ? 'rotate(0)' : 'rotate(90deg)';
+}
+
+function escapeHtml(s) {
+return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+
+</body>
+</html>
