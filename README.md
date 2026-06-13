@@ -26,6 +26,15 @@ Browse your NexusMods tracked mod list in the browser. Connect with your persona
 
 ---
 
+### [VD Conflict Analyser](./conflict-analyser/)
+Visualise and analyse plugin conflicts from xEdit. Upload your conflict export (TSV) to explore conflicts by FormID, identify winning/losing overrides, and understand load order impact at a glance.
+
+Works offline, no installation required. Integrates with [VD Isolate Export Conflicts](https://github.com/ViableDahlia/xedit-scripts) xEdit script.
+
+**[Open tool →](https://viabledahlia.github.io/commonwealth-tools/conflict-analyser/)**
+
+---
+
 ## About
 
 Made by **Viable Dahlia**, a Fallout 4 settlement builder focused on architectural approaches to in-game construction, inspired by [Gemma Wheeler Architecture](https://youtube.com/@gemmawheeler).
@@ -42,5 +51,6 @@ Code in this repository is licensed on a per-tool basis.
 |---|---|
 | MO2 Mod List Reader | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | Nexus Tracker Enhanced | [MIT](./nexus-tracker-enhanced/LICENSE) |
+| VD Conflict Analyser | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 
 See each tool's folder for its individual licence file.
