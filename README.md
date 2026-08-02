@@ -35,6 +35,15 @@ Works offline, no installation required. Integrates with [VD Isolate Export Conf
 
 ---
 
+### [Plugin Viewer](./plugin-viewer/)
+Drop in a `.esp` / `.esm` / `.esl` and see exactly what it contains and does. Decodes and decompresses the plugin entirely in your browser to show record composition by type, new content created vs. records overridden from a master, and heuristic warnings for previs/precombine and LOD impact.
+
+Works fully offline once loaded, no installation or upload required - the file never leaves your machine. Uses [pako](https://github.com/nodeca/pako) (MIT licensed) for zlib inflate, bundled locally.
+
+**[Open tool →](https://viabledahlia.github.io/commonwealth-tools/plugin-viewer/)**
+
+---
+
 ## About
 
 Made by **Viable Dahlia**, a Fallout 4 settlement builder focused on architectural approaches to in-game construction, inspired by [Gemma Wheeler Architecture](https://youtube.com/@gemmawheeler).
@@ -52,5 +61,6 @@ Code in this repository is licensed on a per-tool basis.
 | MO2 Mod List Reader | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | Nexus Tracker Enhanced | [MIT](./nexus-tracker-enhanced/LICENSE) |
 | VD Conflict Analyser | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Plugin Viewer | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (bundles [pako](https://github.com/nodeca/pako), MIT licensed) |
 
 See each tool's folder for its individual licence file.
