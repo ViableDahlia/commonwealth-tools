@@ -1,0 +1,19 @@
+{
+  "24A0FE": ["CC_HasArmorSkins", ""],
+  "000807": ["ccBGSFO4096_miscmod_paint_Synth_Enclave", "Enclave Synth Armor Paint"],
+  "000809": ["ccBGSFO4096_miscmod_paint_Combat_Enclave", "Enclave Combat Armor Paint"],
+  "000808": ["ccBGSFO4096_miscmod_paint_Metal_Enclave", "Enclave Metal Armor Paint"],
+  "000806": ["ccBGSFO4096_miscmod_paint_Leather_Enclave", "Enclave Leather Armor Paint"],
+  "00080B": ["ccBGSFO4096_co_mod_armor_Metal_Material_Enclave", ""],
+  "00080C": ["ccBGSFO4096_co_mod_armor_Synth_Material_Enclave", ""],
+  "00080A": ["ccBGSFO4096_co_mod_armor_CombatArmor_Material_Enclave", ""],
+  "000F9B": ["ccBGSFO4096_co_mod_armor_Leather_Material_Enclave", ""],
+  "000804": ["ccBGSFO4096_mod_armor_Synth_mat_Enclave", "Enclave Paint"],
+  "000803": ["ccBGSFO4096_mod_armor_CombatArmor_mat_Enclave", "Enclave Paint"],
+  "000F9A": ["ccBGSFO4096_mod_armor_Leather_mat_Enclave", "Enclave Paint"],
+  "000805": ["ccBGSFO4096_mod_armor_Metal_mat_Enclave", "Enclave Paint"],
+  "000800": ["ccBGSFO4096_swap_CombatArmor_Enclave", ""],
+  "000F99": ["ccBGSFO4096_swap_LeatherArmor_Enclave", ""],
+  "000802": ["ccBGSFO4096_swap_MetalArmor_Enclave", ""],
+  "000801": ["ccBGSFO4096_swap_SynthArmor_Enclave", ""]
+}
