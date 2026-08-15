@@ -227,19 +227,21 @@
 <nav id="jumpNav" style="display:none;">
   <a href="#headerPanel">Header</a>
   <a href="#mastersPanel">Masters</a>
+  <a href="#comparePanel" id="compareNavLink" style="display:none;">Conflicts</a>
   <a href="#contentPanel">Content</a>
   <a href="#riskPanel">Previs Risk</a>
   <a href="#lodPanel">LOD Impact</a>
   <a href="#treemapPanel">Composition</a>
 </nav>
-<div class="subtitle">// Commonwealth Tools :: partly decompressed, nothing uploaded</div>
+<div class="subtitle">// Commonwealth Tools :: full plugin inspection, decoded and decompressed locally in your browser, nothing uploaded</div>
 
 <div class="dropzone" id="dropzone">
   <div>Drop a .esp / .esm / .esl here, or click to browse</div>
-  <div class="hint">Parsed entirely in your browser. The file never leaves your machine, aside from decompression.</div>
-  <input type="file" id="fileInput" accept=".esp,.esm,.esl">
+  <div class="hint">Parsed entirely in your browser. The file never leaves your machine.<br>Drop two plugins (or add a second later) to check them for record-level conflicts.</div>
+  <input type="file" id="fileInput" accept=".esp,.esm,.esl" multiple>
 </div>
 <div class="status" id="status"></div>
+<div class="status" id="enrichStatus" style="font-style:italic;"></div>
 
 <div class="panel" id="headerPanel" style="display:none;">
   <h2>HEADER</h2>
@@ -250,6 +252,16 @@
 <div class="panel" id="mastersPanel" style="display:none;">
   <h2>MASTERS</h2>
   <ul class="masters" id="mastersList"></ul>
+</div>
+
+<div class="panel" id="comparePanel" style="display:none;">
+  <h2>PLUGIN CONFLICT CHECK</h2>
+  <div id="compareSummary" style="font-size:0.9rem; margin-bottom:10px;"></div>
+  <div id="comparePatchNote" style="font-size:0.8rem; color:var(--amber); margin-bottom:10px;"></div>
+  <div id="compareResults"></div>
+  <div style="font-size:0.75rem; color:var(--green-dim); margin-top:10px; border-top:1px solid var(--green-faint); padding-top:8px;">
+    Record-level comparison only: both plugins overriding the same record means the later-loading one wins that record entirely. This can't tell whether they change the same <em>fields</em> within it. For field-level conflict analysis, use xEdit (and the Conflict Analyser for its exports).
+  </div>
 </div>
 
 <div class="panel" id="riskPanel" style="display:none;">
@@ -467,19 +479,23 @@ function processRecord(dv, recOffset, dataSize, tally, newRecords, overrideRecor
     payloadBytes = null; // tally already counted; just skip name extraction for this record
   }
 
-  let editorId = '', fullName = '', localizedUnavailable = false, baseObjectFormID = null;
+  let editorId = '', fullName = '', localizedUnavailable = false, baseObjectFormID = null, cellGrid = null;
   if(payloadBytes){
     const names = extractNames(payloadBytes, isLocalized);
     editorId = names.editorId;
     fullName = names.fullName;
     localizedUnavailable = names.localizedUnavailable;
     baseObjectFormID = names.baseObjectFormID;
+    cellGrid = names.cellGrid;
   }
 
   const topByte = (formID >>> 24) & 0xFF;
   const entry = { sig: rSig, formID, editorId, fullName, localizedUnavailable };
   if((rSig === 'REFR' || rSig === 'ACHR') && baseObjectFormID !== null){
     entry.baseObjectFormID = baseObjectFormID;
+  }
+  if(rSig === 'CELL' && cellGrid !== null){
+    entry.cellGrid = cellGrid;
   }
 
   if(topByte === 0xFE){
@@ -504,7 +520,7 @@ function processRecord(dv, recOffset, dataSize, tally, newRecords, overrideRecor
 function extractNames(payload, isLocalized){
   const dv2 = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
   let o = 0;
-  let editorId = '', fullName = '', localizedUnavailable = false, baseObjectFormID = null;
+  let editorId = '', fullName = '', localizedUnavailable = false, baseObjectFormID = null, cellGrid = null;
 
   while(o + 6 <= payload.byteLength){
     const code = String.fromCharCode(dv2.getUint8(o), dv2.getUint8(o+1), dv2.getUint8(o+2), dv2.getUint8(o+3));
@@ -522,11 +538,12 @@ function extractNames(payload, isLocalized){
       }
     } else if(code === 'NAME' && length === 4 && baseObjectFormID === null){
       baseObjectFormID = dv2.getUint32(dataStart, true);
+    } else if(code === 'XCLC' && length >= 8 && cellGrid === null){
+      cellGrid = { x: dv2.getInt32(dataStart, true), y: dv2.getInt32(dataStart+4, true) };
     }
     o = dataStart + length;
-    if(editorId && (fullName || localizedUnavailable) && baseObjectFormID !== null) break;
   }
-  return { editorId, fullName, localizedUnavailable, baseObjectFormID };
+  return { editorId, fullName, localizedUnavailable, baseObjectFormID, cellGrid };
 }
 
 function readCStringFromBytes(bytes, start, length){
@@ -826,10 +843,10 @@ dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover
 dropzone.addEventListener('drop', e => {
   e.preventDefault();
   dropzone.classList.remove('dragover');
-  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  if(e.dataTransfer.files.length) handleFiles(Array.from(e.dataTransfer.files));
 });
 fileInput.addEventListener('change', e => {
-  if(e.target.files.length) handleFile(e.target.files[0]);
+  if(e.target.files.length) handleFiles(Array.from(e.target.files));
 });
 
 document.querySelectorAll('.toggle-btn').forEach(btn => {
@@ -841,25 +858,274 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
   });
 });
 
-function handleFile(file){
-  statusEl.textContent = `Reading ${file.name}...`;
+/* Keeps the two most recently loaded plugins; when two are present,
+   the conflict check panel appears. Dropping a third replaces the oldest. */
+let loadedPlugins = [];
+
+function readFileAsArrayBuffer(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error(`Could not read ${file.name}`));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function handleFiles(files){
+  const toLoad = files.slice(0, 2); // at most two per drop
   statusEl.classList.remove('error');
-  const reader = new FileReader();
-  reader.onload = () => {
+
+  for(const file of toLoad){
+    statusEl.textContent = `Reading ${file.name}...`;
     try{
-      const result = parsePlugin(reader.result);
+      const buffer = await readFileAsArrayBuffer(file);
+      const result = parsePlugin(buffer);
+      loadedPlugins.push({ name: file.name, result });
+      if(loadedPlugins.length > 2) loadedPlugins.shift();
       displayResult(file.name, result);
-      statusEl.textContent = `Parsed ${file.name} — ${Object.keys(result.tally).length} record types found.`;
     } catch(err){
-      statusEl.textContent = `Error: ${err.message}`;
+      statusEl.textContent = `Error in ${file.name}: ${err.message}`;
       statusEl.classList.add('error');
+      return;
     }
-  };
-  reader.onerror = () => {
-    statusEl.textContent = 'Could not read file.';
-    statusEl.classList.add('error');
-  };
-  reader.readAsArrayBuffer(file);
+  }
+
+  const latest = loadedPlugins[loadedPlugins.length - 1];
+  if(loadedPlugins.length === 2){
+    renderComparePanel(loadedPlugins[0], loadedPlugins[1]);
+    statusEl.textContent = `Parsed ${latest.name}. Comparing ${loadedPlugins[0].name} vs ${loadedPlugins[1].name}. Detail panels below show ${latest.name}.`;
+  } else {
+    statusEl.textContent = `Parsed ${latest.name}: ${Object.keys(latest.result.tally).length} record types found. Drop a second plugin to check for conflicts.`;
+  }
+
+  const allMasterNames = new Set();
+  loadedPlugins.forEach(p => p.result.masters.forEach(m => allMasterNames.add(m)));
+  const anyChanged = await enrichNamesFromMasterIndices(Array.from(allMasterNames), loadedPlugins);
+  if(anyChanged){
+    renderContentPanel(latest.result);
+    if(loadedPlugins.length === 2) renderComparePanel(loadedPlugins[0], loadedPlugins[1]);
+  }
+}
+
+/* ---------- master-index enrichment ----------
+   Fetches pre-generated FormID -> [EDID, FULL] indices for vanilla/DLC/CC
+   masters (built offline via an xEdit script, since the browser can't
+   resolve localized strings from just the loaded plugin). Fetched lazily,
+   only for masters actually present in whatever's loaded, and cached for
+   the session so repeated files don't refetch. A missing index (e.g. for
+   a mod master we haven't generated one for) is a normal, silent miss -
+   not every master will have one, and that's fine. */
+const ASSET_BASE_PATH = 'assets/';
+const masterIndexCache = {}; // masterName -> {hexLocalId: [edid, full]} | null (fetch failed/404)
+
+async function loadMasterIndex(masterName){
+  if(masterName in masterIndexCache) return masterIndexCache[masterName];
+  try{
+    const resp = await fetch(ASSET_BASE_PATH + encodeURIComponent(masterName) + '.index.json');
+    if(!resp.ok){ masterIndexCache[masterName] = null; return null; }
+    const data = await resp.json();
+    masterIndexCache[masterName] = data;
+    return data;
+  } catch(err){
+    masterIndexCache[masterName] = null;
+    return null;
+  }
+}
+
+function lookupInMasterIndex(masterName, formID){
+  const idx = masterIndexCache[masterName];
+  if(!idx) return null;
+  const key = (formID & 0x00FFFFFF).toString(16).padStart(6, '0');
+  const entry = idx[key];
+  if(!entry) return null;
+  const [edid, full] = entry;
+  return full || edid || null;
+}
+
+async function enrichNamesFromMasterIndices(masterNames, plugins){
+  if(masterNames.length === 0) return false;
+  const enrichEl = document.getElementById('enrichStatus');
+  enrichEl.textContent = `Checking for bundled vanilla/DLC name data for ${masterNames.length} master${masterNames.length>1?'s':''}...`;
+
+  await Promise.all(masterNames.map(loadMasterIndex));
+
+  const foundFor = masterNames.filter(m => masterIndexCache[m]);
+  if(foundFor.length === 0){
+    enrichEl.textContent = '';
+    return false;
+  }
+
+  let changed = false;
+  plugins.forEach(p => {
+    [...p.result.newRecords, ...p.result.overrideRecords].forEach(entry => {
+      // Fill in the override's own identity if this plugin didn't carry a name itself
+      if(!entry.fullName && !entry.editorId && entry.masterName && masterIndexCache[entry.masterName]){
+        const resolved = lookupInMasterIndex(entry.masterName, entry.formID);
+        if(resolved){ entry.fullName = resolved; changed = true; }
+      }
+      // Fill in REFR/ACHR placement targets that fell back to a generic master note
+      if((entry.sig === 'REFR' || entry.sig === 'ACHR') && entry.baseObjectFormID !== undefined && entry.baseObjectFormID !== null){
+        const topByte = (entry.baseObjectFormID >>> 24) & 0xFF;
+        if(topByte < p.result.masters.length){
+          const targetMaster = p.result.masters[topByte];
+          if(masterIndexCache[targetMaster]){
+            const resolved = lookupInMasterIndex(targetMaster, entry.baseObjectFormID);
+            if(resolved && entry.baseObjectName && entry.baseObjectName.startsWith('(unnamed')){
+              entry.baseObjectName = resolved;
+              changed = true;
+            }
+          }
+        }
+      }
+    });
+  });
+
+  enrichEl.textContent = changed
+    ? `Resolved additional names from bundled data for: ${foundFor.join(', ')}.`
+    : `Bundled name data found for ${foundFor.join(', ')}, but nothing new to resolve.`;
+  return changed;
+}
+
+/* ---------- record-level conflict comparison ----------
+   Identity of an override record = which master it modifies + the record's
+   local FormID (lower 3 bytes). Two plugins conflict at record level when
+   both override the same identity: the later-loading plugin wins that
+   record entirely. NOT field-level analysis - that's xEdit's job. */
+function overrideKey(entry){
+  return entry.masterName.toLowerCase() + ':' + (entry.formID & 0x00FFFFFF).toString(16);
+}
+
+function renderComparePanel(a, b){
+  const panel = document.getElementById('comparePanel');
+  const summaryEl = document.getElementById('compareSummary');
+  const patchNoteEl = document.getElementById('comparePatchNote');
+  const resultsEl = document.getElementById('compareResults');
+
+  // Patch relationship: one plugin lists the other as a master
+  const aName = a.name.toLowerCase(), bName = b.name.toLowerCase();
+  const bPatchesA = b.result.masters.some(m => m.toLowerCase() === aName);
+  const aPatchesB = a.result.masters.some(m => m.toLowerCase() === bName);
+  patchNoteEl.textContent = '';
+  if(bPatchesA){
+    patchNoteEl.textContent = `${b.name} lists ${a.name} as a master, so overlaps below are intentional patch overrides, not accidental conflicts.`;
+  } else if(aPatchesB){
+    patchNoteEl.textContent = `${a.name} lists ${b.name} as a master, so overlaps below are intentional patch overrides, not accidental conflicts.`;
+  }
+
+  // Build identity maps of each plugin's overrides
+  const mapA = {};
+  a.result.overrideRecords.forEach(e => { mapA[overrideKey(e)] = e; });
+
+  const shared = [];
+  b.result.overrideRecords.forEach(e => {
+    const k = overrideKey(e);
+    if(mapA[k]) shared.push({ a: mapA[k], b: e });
+  });
+
+  if(shared.length === 0){
+    summaryEl.innerHTML = `<span class="risk-badge risk-none">NO SHARED OVERRIDES</span>
+      <div style="margin-top:8px;">${escapeHtml(a.name)} and ${escapeHtml(b.name)} do not override any of the same records.</div>`;
+    resultsEl.innerHTML = '';
+  } else {
+    const level = shared.length > 20 ? 'high' : (shared.length > 5 ? 'moderate' : 'low');
+
+    // Pattern recognition: CELL plus worldspace/navmesh overlap is the
+    // classic previs/precombine collision signature, but ONLY when there's
+    // actual exterior evidence — interior cell overlaps are a different,
+    // usually unrelated concern (previs/precombine is an exterior-worldspace thing)
+    const sharedSigs = new Set(shared.map(p => p.a.sig));
+    const hasExteriorCellOverlap = shared.some(p => (p.a.sig === 'CELL') && (p.a.cellGrid || p.b.cellGrid));
+    let patternNote = '';
+    if((hasExteriorCellOverlap || sharedSigs.has('WRLD')) && (sharedSigs.has('NAVI') || sharedSigs.has('NAVM') || sharedSigs.has('WRLD') || hasExteriorCellOverlap)){
+      patternNote = `<div style="margin-top:8px; color:var(--amber);">This overlap pattern (exterior Cells plus Worldspace/Navmesh data) is characteristic of a previs/precombine collision. If one of these plugins is a previs patch, it must load after the other to win these records.</div>`;
+    } else if(sharedSigs.has('CELL') && !hasExteriorCellOverlap){
+      patternNote = `<div style="margin-top:8px; color:var(--green-dim);">The shared Cell records here are interior cells. Interior cells aren't part of precombine/previs, so this overlap is likely unrelated to that (could be lighting, ownership, or encounter zone changes) — worth a quick xEdit check rather than assuming a previs conflict.</div>`;
+    }
+
+    summaryEl.innerHTML = `<span class="risk-badge risk-${level}">${shared.length} SHARED OVERRIDE${shared.length>1?'S':''}</span>
+      <div style="margin-top:8px;">Both plugins override the following record${shared.length>1?'s':''}. Whichever loads later wins each record entirely.</div>
+      <div style="margin-top:4px; font-size:0.8rem; color:var(--green-dim);">That's ${shared.length} of ${a.result.overrideRecords.length} total overrides in ${escapeHtml(a.name)} (${Math.round(shared.length/Math.max(a.result.overrideRecords.length,1)*100)}%), and ${shared.length} of ${b.result.overrideRecords.length} in ${escapeHtml(b.name)} (${Math.round(shared.length/Math.max(b.result.overrideRecords.length,1)*100)}%).</div>${patternNote}`;
+
+    // Per-type context worth surfacing so overlap isn't over-read as alarming
+    const TYPE_CONTEXT = {
+      NAVI: 'NAVI is a single global navmesh index record. Nearly every plugin that edits navmeshes overrides it, so overlap here is expected rather than alarming.',
+      WRLD: 'Worldspace overrides commonly carry previs timestamps, map bounds, and persistent data rather than wholesale world changes.',
+      CELL: 'Cell overrides carry previs/precombine timestamps and cell metadata. Both plugins touching the same cell means the previs data of whichever loads later applies to that cell.'
+    };
+
+    // Group by record type, reusing the content-group styling
+    const groups = {};
+    shared.forEach(pair => {
+      const sigStr = pair.a.sig;
+      if(!groups[sigStr]) groups[sigStr] = [];
+      groups[sigStr].push(pair);
+    });
+
+    resultsEl.innerHTML = '';
+    Object.entries(groups)
+      .sort((x,y) => y[1].length - x[1].length)
+      .forEach(([sigStr, pairs]) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'content-group';
+        const title = document.createElement('div');
+        title.className = 'content-group-title';
+        title.innerHTML = `${labelFor(sigStr)} <span class="count">${pairs.length}x · ${sigStr}</span>`;
+        wrap.appendChild(title);
+
+        const namesEl = document.createElement('div');
+        namesEl.className = 'content-names';
+        const maxShown = 15;
+
+        // Split into pairs we can name vs genuinely unnamed ones
+        const describable = [];
+        const unnamed = [];
+        pairs.forEach(pair => {
+          const best = pair.a.fullName || pair.a.editorId || pair.b.fullName || pair.b.editorId;
+          const placed = pair.a.baseObjectName || pair.b.baseObjectName;
+          const grid = pair.a.cellGrid || pair.b.cellGrid;
+          if(best){
+            describable.push({ html: escapeHtml(best), pair });
+          } else if(sigStr === 'CELL' && grid){
+            describable.push({ html: `exterior cell (${grid.x}, ${grid.y})`, pair, exterior: true });
+          } else if(sigStr === 'CELL'){
+            describable.push({ html: '<span class="unnamed">(interior cell)</span>', pair, exterior: false });
+          } else if((sigStr === 'REFR' || sigStr === 'ACHR') && placed && !placed.startsWith('(')){
+            describable.push({ html: `places ${escapeHtml(placed)}`, pair });
+          } else if(pair.a.localizedUnavailable || pair.b.localizedUnavailable){
+            describable.push({ html: '<span class="unnamed">(localized, name unavailable)</span>', pair });
+          } else {
+            unnamed.push(pair);
+          }
+        });
+
+        const parts = describable.slice(0, maxShown).map(d => {
+          const localId = (d.pair.a.formID & 0x00FFFFFF).toString(16).toUpperCase().padStart(6,'0');
+          return `${d.html} <span class="master-tag">(${escapeHtml(d.pair.a.masterName)} · ${localId})</span>`;
+        });
+        if(describable.length > maxShown){
+          parts.push(`<span class="more">+ ${describable.length - maxShown} more</span>`);
+        }
+        if(unnamed.length > 0){
+          const sampleIds = unnamed.slice(0, 5)
+            .map(p => (p.a.formID & 0x00FFFFFF).toString(16).toUpperCase().padStart(6,'0'))
+            .join(', ');
+          const suffix = unnamed.length > 5 ? `, +${unnamed.length - 5} more` : '';
+          parts.push(`<span class="unnamed">${unnamed.length} unnamed record${unnamed.length>1?'s':''} (FormIDs: ${sampleIds}${suffix})</span>`);
+        }
+        namesEl.innerHTML = parts.join(', ');
+        wrap.appendChild(namesEl);
+        if(TYPE_CONTEXT[sigStr]){
+          const ctx = document.createElement('div');
+          ctx.style.cssText = 'font-size:0.72rem; color:var(--green-dim); margin-top:4px;';
+          ctx.textContent = TYPE_CONTEXT[sigStr];
+          wrap.appendChild(ctx);
+        }
+        resultsEl.appendChild(wrap);
+      });
+  }
+
+  panel.style.display = 'block';
+  document.getElementById('compareNavLink').style.display = '';
 }
 
 function displayResult(filename, result){
@@ -1062,7 +1328,7 @@ const navObserver = new IntersectionObserver((entries) => {
   });
 }, { rootMargin: '-56px 0px -70% 0px', threshold: 0 });
 
-['headerPanel','mastersPanel','contentPanel','riskPanel','lodPanel','treemapPanel'].forEach(id => {
+['headerPanel','mastersPanel','comparePanel','contentPanel','riskPanel','lodPanel','treemapPanel'].forEach(id => {
   const el = document.getElementById(id);
   if(el) navObserver.observe(el);
 });
