@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I set up a second copy of Fallout 4 - Commonwealth Tools</title>
+<meta name="description" content="Learn how to safely run a second copy of Fallout 4.">
+<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools//how-to-manually-copy-fallout-4-steam/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+  --bg: #050d06;            /* Deep terminal black-green */
+  --bg-raised: #0d1a0e;     /* Elevated card background */
+  --body-text: #1ef35f;     /* High-legibility phosphor green */
+  --heading: #74ff9d;       /* Bright mint-green headline focus */
+  --secondary: #13913a;     /* Muted green for subtext */
+  --border: #0e3016;        /* Subtle green frame */
+  --border-bright: #1ef35f; /* Sharp border highlight */
+  --focus: #74ff9d;         /* High-visibility active ring */
+  --scanline-opacity: 0.02;
+}
+
+  /* Light mode: printed terminal report on paper, not a plain inversion.
+     Keeps the amber/green split, just re-tuned for a bright background. */
+  html[data-theme="light"] {
+  --bg: #f2ece1;            /* Aged newsprint/terminal paper */
+  --bg-raised: #e5dccb;     /* Inset panels or highlighted doc blocks */
+  --body-text: #2c2518;     /* High-contrast ink dark neutral (prevents reading fatigue) */
+  --heading: #1e5222;       /* Archival stamp green for headers */
+  --secondary: #7a5814;     /* Burnt amber/sepia for secondary meta text */
+  --border: #d4c7b0;        /* Subtle paper margin line */
+  --border-bright: #1e5222; /* High-contrast focus/active border */
+  --focus: #1e5222;         /* Focus indicator matching green ink */
+  --scanline-opacity: 0;    /* Disabled for paper texture */
+}
+
+  * { box-sizing: border-box; }
+
+  html { transition: none; }
+
+  body {
+    background: var(--bg);
+    color: var(--body-text);
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+
+  /* Scanline atmosphere, subtle, not decorative noise */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(57, 255, 20, var(--scanline-opacity)),
+      rgba(57, 255, 20, var(--scanline-opacity)) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 1;
+    transition: background 0.15s ease;
+  }
+
+  body, .infobox, .payoff, details, .image-slot, .icon-slot, .resource-slot,
+  .related-links a, code, .code, table, th, td {
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    background: var(--bg-raised);
+    color: var(--heading);
+    border: 1px solid var(--border-bright);
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+  }
+  .theme-toggle:hover { background: rgba(57, 255, 20, 0.08); }
+  html[data-theme="light"] .theme-toggle:hover { background: rgba(27, 94, 18, 0.08); }
+
+  @media (max-width: 520px) {
+    .theme-toggle {
+      position: static;
+      display: block;
+      width: fit-content;
+      margin: 0 auto 1.5rem;
+    }
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  h1, h2, h3 {
+    font-family: 'VT323', monospace;
+    color: var(--heading);
+    letter-spacing: 0.02em;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 0 6px rgba(57, 255, 20, 0.25);
+  }
+
+  h1 {
+    font-size: 2.6rem;
+    margin-top: 0;
+    border-bottom: 2px solid var(--border-bright);
+    padding-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.9rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.3rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+    color: var(--secondary);
+  }
+
+  a { color: var(--heading); text-decoration: underline; text-underline-offset: 2px; }
+  a:hover { text-shadow: 0 0 6px rgba(57,255,20,0.5); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .eyebrow {
+    font-family: 'VT323', monospace;
+    color: var(--secondary);
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .infobox {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-bright);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .infobox dl {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+  }
+  .infobox dt { color: var(--secondary); }
+  .infobox dd { margin: 0; }
+  .infobox .icon-slot {
+    border: 1px dashed var(--border-bright);
+    color: var(--secondary);
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .why-grid { display: grid; gap: 1.25rem; margin-top: 1rem; }
+  .why-card {
+    border-left: 3px solid var(--heading);
+    padding-left: 1rem;
+  }
+  .why-card h3 { margin-top: 0; }
+
+  .payoff {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .payoff .label {
+    font-family: 'VT323', monospace;
+    color: var(--heading);
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .payoff .action .label { color: var(--secondary); }
+
+  ol.quick-list, 
+  ol.detail-list { 
+  padding-left: 0; /* Remove left padding since absolute/inline pseudo-elements handle alignment */
+  list-style: none;
+  counter-reset: fallout-counter;
+}
+
+ol.quick-list li { 
+  margin-bottom: 0.4rem; 
+  counter-increment: fallout-counter;
+}
+
+ol.quick-list li::before {
+  /* Generates padded numbers like [ 01 ], [ 02 ] */
+  content: "[" counter(fallout-counter, decimal-leading-zero) "]";
+  color: var(--heading); /* Scales with theme (Amber/Green in dark, Archival Green in light) */
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  /* Terminal glow in dark mode using CSS variable alpha trick */
+  text-shadow: 0 0 5px var(--focus);
+}
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.75rem auto;
+  border: 1px solid var(--border-bright);
+}
+/* Strip text glow on light mode for paper printout effect */
+html[data-theme="light"] ol.quick-list li::before {
+  text-shadow: none;
+}
+
+  .reward-line {
+    color: var(--secondary);
+    margin-top: 1rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 2rem;
+    font-size: 0.95rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+  }
+  th {
+    font-family: 'VT323', monospace;
+    color: var(--heading);
+    font-size: 1.15rem;
+    letter-spacing: 0.05em;
+    background: var(--bg-raised);
+  }
+  td.status { text-align: center; width: 3rem; }
+
+  .step-block { margin-bottom: 1.75rem; }
+  .step-block h4 {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--body-text);
+    font-weight: bold;
+    margin: 0 0 0.4rem;
+  }
+  .step-block p { margin: 0.3rem 0; }
+
+  code, .code {
+    font-family: 'Share Tech Mono', monospace;
+    background: rgba(57, 255, 20, 0.06);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.35rem;
+    color: var(--heading);
+    font-size: 0.92em;
+  }
+
+  .image-slot {
+    border: 1px dashed var(--border-bright);
+    color: var(--secondary);
+    font-size: 0.85rem;
+    padding: 1rem;
+    text-align: center;
+    margin: 0.75rem 0 1.25rem;
+  }
+
+  details {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+  }
+  summary {
+    font-family: 'VT323', monospace;
+    color: var(--heading);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .resource-list { list-style: none; padding: 0; margin: 1rem 0; }
+  .resource-slot {
+    border: 1px dashed var(--border-bright);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.6rem;
+    color: var(--secondary);
+    font-size: 0.9rem;
+  }
+
+  .related-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+  .related-links a {
+    border: 1px solid var(--border-bright);
+    padding: 0.4rem 0.75rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .related-links a:hover { background: rgba(57,255,20,0.06); }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  @media (max-width: 520px) {
+    .infobox dl { grid-template-columns: 1fr; }
+    .infobox dt { margin-top: 0.5rem; }
+    h1 { font-size: 2.1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<button id="theme-toggle" class="theme-toggle" aria-pressed="false" aria-label="Switch to light mode">☀ Light mode</button>
+<div class="page">
+
+  <p class="eyebrow">Commonwealth Tools // Guide</p>
+  <h1>How I set up a second copy of Fallout 4</h1>
+
+  <img
+  src="/assets/how-i-set-up-two-copies-of-fallout4.png"
+  alt="banner" />
+
+  <div class="infobox">
+    <dl>
+      <dt>Type</dt><dd>Guide, Modding &amp; Setup</dd>
+      <dt>Purpose</dt><dd>Run a second, fully separate copy of Fallout 4 alongside your main install</dd>
+      <dt>Requirements</dt><dd>Steam copy of Fallout 4, ~30GB free space, Mod Organizer 2, Fallout 4 Script Extender (F4SE - optional)</dd>
+      <dt>Time needed</dt><dd>15–30 minutes</dd>
+      <dt>Outcome</dt><dd>A separate copy of Fallout 4 with its own portable MO2, preferences, saves, and mods</dd>
+    </dl>
+  </div>
+
+  <h2>Why do this</h2>
+  <p>Steam needn't be the boss of your updates. Yes, Steam might want to automatically update Fallout 4 whenever Bethesda pushed out something new, but you can choose to hit <a href="https://youtube.com/shorts/SbTS0UDKAvU?si=mgFtvo5BP8dUIqRp">[[Pause]]</a> and you can make a second (or third, or fourth!) copy of Fallout 4.</p>
+  <p>Why? So there's three common reasons vaulties want a separate copy of Fallout 4:</p>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <h3>Mod compatibility</h3>
+      <p>Some mods only work on the older version of the game (OG), before the next-gen update (NG) or the Anniversary Edition (AE). Steam always installs the latest version (AE) and updating breaks some OG mods, while downgrading means missing out on the latest mods and access to the in-game Creations menu.</p>
+    </div>
+    <div class="why-card">
+      <h3>Save game safety</h3>
+      <p>Updates can break existing saves. A separate copy means you can test a new update on a fresh install first, without risking a save you've spent hours building your settlement in.</p>
+    </div>
+    <div class="why-card">
+      <h3>Running multiple Wabbajack modlists</h3>
+      <p>Different <a href="https://www.wabbajack.org/gallery?game=fallout4">Wabbajack modlists</a> need different game versions and each deserves its own clean install to avoid conflicts. A separate copy per Wabbajack modlist means you can run several at once without them fighting over the same files.</p>
+    </div>
+  </div>
+
+  <p>How? Get the best of all worlds with a fully separate copy of Fallout 4. Each copy stays locked to whichever version and modlist you decide. And you're free to update, downgrade, or experiment on any single copy without risking the others.</p>
+  <p><strong>YOU'RE PREPARED FOR THE FUTURE!</strong></p>
+
+  <hr>
+
+  <h2>Quick walkthrough</h2>
+  <ol class="quick-list">
+    <li>Find and copy your Fallout 4 folder</li>
+    <li>Check the game version (optional but highly recommended)</li>
+    <li>Download the matching F4SE build (optional but highly recommended)</li>
+    <li>Install F4SE into the copy (optional but highly recommended)</li>
+    <li>Confirm the copy launches</li>
+    <li>Download and install MO2 as a portable instance</li>
+    <li>Point MO2 at the copy, enable local save games (and game settings)</li>
+    <li>Verify paths and launch through MO2</li>
+  </ol>
+  <p class="reward-line"><strong>Reward</strong>: a clean, independent Fallout 4 copy<br><strong>Leads to</strong>: upgrading, downgrading, or installing a Wabbajack modlist</p>
+
+  <hr>
+
+  <h2>Detailed Walkthrough</h2>
+
+  <h3>Part 1: Copy the game</h3>
+
+  <div class="step-block">
+    <h4>Locate your Fallout 4 folder</h4>
+    <p>Right-click Fallout 4 in Steam Library, choose <strong>Manage</strong>, then <strong>Browse local files</strong>. Or check manually at <code>C:\Program Files (x86)\Steam\steamapps\common\Fallout 4</code>, adjusted for your drive. <strong>Note</strong>: Steam Settings, then Storage, lists all library folders if you're unsure which one.</p>
+    <img src="assets/steam-manage-menu.png" alt="Steam - Manage menu"/>
+  </div>
+
+  <div class="step-block">
+    <h4>Copy that folder</h4>
+	<p>Copy your Fallout 4 folder to a new location, for example: <code>C:\Games\Fallout4_Copy</code>.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Check your Fallout 4 version</h4>
+    <p>Right-click <code>Fallout4.exe</code>, Properties, Details tab, check File version. Or in-game, bottom left of the Settings menu. There are three main game versions to be aware of:</p>
+    <ol class="quick-list">
+	<li><code>1.10.163</code> - OG, the long-stable pre-2024 version.</li>
+    <li><code>1.10.984</code> - NG, the April 2024 Next-Gen update.</li>
+    <li><code>1.11.1xx</code> - AE, the November 2025 Anniversary Edition version edition you'd get from Steam today.</li>
+    <img src="assets/check-version.png" alt="Fallout4.exe Properties Details tab, Game version highlighted" />
+  </div>
+
+  <div class="step-block">
+    <h4>Download the matching F4SE build (optional but highly recommended)</h4>
+    <p>Current version is at <a href="https://f4se.silverlock.org">f4se.silverlock.org</a> covers AE and NG. Archived versions, needed for OG <code>1.10.163</code>, is at <a href="https://f4se.silverlock.org/archive">f4se.silverlock.org/archive</a>. Match the build to the exact tier you checked above, an AE build won't run on an OG copy and vice versa. <strong>Note<strong>: Recommended to give you complete control over the game launch. If Steam decides you need an update, F4SE let's you completely bypass that.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Install F4SE into the copy</h4>
+    <p>Extract into your new folder, for example, <code>C:\Games\Fallout4_Copy\Fallout4\</code>, alongside <code>Fallout4.exe</code>. <strong>Note<strong>: Skip this step if you already have F4SE installed.
+  </div>
+
+  <div class="step-block">
+    <h4>Confirm the game runs</h4>
+    <p>Launch <code>Fallout4.exe</code> preferably using the F4SE launcher: <code>f4se_loader.exe</code> directly. <strong>Note<strong>: Keep Steam running in the background, <code>steam_api64.dll</code> needs an active session even for a direct launch.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Note on shared data</h4>
+    <p>This second copy of Fallout 4 still reads and writes to <code>Documents\My Games\Fallout4</code>. Existing saves and INIs will show up here until MO2 redirects them. No sweat, this behaviour is expected at this stage.</p>
+  </div>
+
+  <h3>Part 2: Set up portable MO2</h3>
+
+  <div class="step-block">
+    <h4>Download MO2</h4>
+    <p>From the Assets section in <a href="https://github.com/Modorganizer2/modorganizer/releases">Mod Organizer 2 GitHub releases</a> page.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Install as a portable instance</h4>
+    <p>Point the installer at a folder of your choice, I use the same parent folder, for example: <code>C:\Games\Fallout4_Copy\MO2</code>. Choose Portable instance when MO2 asks Global or Portable on first launch.</p>
+    <img src="assets/mo2-wizard.png" alt="MO2 first-launch wizard, Global vs Portable choice screen" />
+  </div>
+
+  <div class="step-block">
+    <h4>Point MO2 at your game copy</h4>
+    <p>Browse to your Fallout 4 copy, for example: <code>C:\Games\Fallout4_Copy\Fallout4\</code> as the managed game folder.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Enable separate saves (and game settings)</h4>
+    <p>Tick profile-specific save games and INI files on the profile settings screen. This keeps your save files and game settings completely seperate.</p>
+    <img src="assets/local-savegames.png" alt="MO2 profile settings, Local Savegames checkbox ticked" />
+  </div>
+
+  <div class="step-block">
+    <h4>Verify paths</h4>
+    <p>Open <code>ModOrganizer.ini</code> inside the MO2 folder, confirm paths point to the new copy. Check Modify Executables in MO2 for the F4SE loader as double check.</p>
+  </div>
+
+  <div class="step-block">
+    <h4>Launch and confirm clean state</h4>
+    <p>Launch via MO2. Confirm old saves don't appear.</p>
+  </div>
+
+  <hr>
+
+  <h2>Stages</h2>
+  <table>
+    <thead>
+      <tr><th>Stage</th><th>Status</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>10</td><td class="status">☐</td><td>Find Fallout 4 install folder</td></tr>
+      <tr><td>20</td><td class="status">☐</td><td>Copy folder to new location</td></tr>
+      <tr><td>30</td><td class="status">☐</td><td>Check game version</td></tr>
+      <tr><td>40</td><td class="status">☐</td><td>Download matching F4SE build</td></tr>
+      <tr><td>50</td><td class="status">☐</td><td>Install F4SE into copy</td></tr>
+      <tr><td>60</td><td class="status">☐</td><td>Confirm copy launches standalone</td></tr>
+      <tr><td>70</td><td class="status">☐</td><td>Download MO2</td></tr>
+      <tr><td>80</td><td class="status">☐</td><td>Install MO2 as portable instance</td></tr>
+      <tr><td>90</td><td class="status">☐</td><td>Point MO2 at the copy</td></tr>
+      <tr><td>100</td><td class="status">☐</td><td>Enable Local Savegames (and game settings)</td></tr>
+      <tr><td>110</td><td class="status">☐</td><td>Verify ModOrganizer.ini paths and executables</td></tr>
+      <tr><td>120</td><td class="status">✅</td><td>Copy confirmed clean, ready for mods</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Notes</h2>
+
+  <div class="payoff">
+    <span class="label">Payoff</span>
+    <p>The Fallout 4 copy launches first try, no version mismatch errors.</p>
+    <span class="label action">Action</span>
+    <p>Match the F4SE build to your exact game version before installing anything. There are three main versions now: OG, NG, and AE.</p>
+  </div>
+
+  <div class="payoff">
+    <span class="label">Payoff</span>
+    <p>This Fallout 4 copy becomes a truly independent game, script extender and all, not just a folder with the same files in it.</p>
+    <span class="label action">Action</span>
+    <p>Install F4SE. Optional, but recommended, this is the step that actually separates the two copies rather than just duplicating them.</p>
+  </div>
+
+  <div class="payoff">
+    <span class="label">Payoff</span>
+    <p>The Fallout 4 game launches even outside Steam's own launcher.</p>
+    <span class="label action">Action</span>
+    <p>Keep the Steam client open in the background, even for direct exe launches.</p>
+  </div>
+
+  <div class="payoff">
+    <span class="label">Payoff</span>
+    <p>The new Fallout 4 copy stays genuinely clean, no old saves sneaking in.</p>
+    <span class="label action">Action</span>
+    <p>Tick profile-specific save games in MO2's profile settings, don't rely on a different in-game profile alone.</p>
+  </div>
+
+  <hr>
+
+  <h2>Resources</h2>
+  <iframe style="border: 0; width: 100%; height: 450px;" allowfullscreen frameborder="0" src="https://viabledahlia.raindrop.page/mod-managers-and-downgrade-tools-74272451/embed"></iframe>
+
+  <hr>
+
+  <h2>Related pages</h2>
+  <div class="related-links">
+    <a href="https://viabledahlia.github.io/commonwealth-tools/">Commonwealth Tools</a>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var STORAGE_KEY = 'cwtools-theme';
+    var root = document.documentElement;
+    var toggle = document.getElementById('theme-toggle');
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+        toggle.textContent = '● Dark mode';
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.setAttribute('aria-label', 'Switch to dark mode');
+      } else {
+        root.removeAttribute('data-theme');
+        toggle.textContent = '☀ Light mode';
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.setAttribute('aria-label', 'Switch to light mode');
+      }
+    }
+
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    applyTheme(saved === 'light' ? 'light' : 'dark');
+
+    toggle.addEventListener('click', function () {
+      var isLight = root.getAttribute('data-theme') === 'light';
+      var next = isLight ? 'dark' : 'light';
+      applyTheme(next);
+      try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>
