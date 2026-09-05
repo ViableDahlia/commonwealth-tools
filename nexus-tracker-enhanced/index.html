@@ -250,6 +250,63 @@
     flex-shrink: 0;
   }
 
+  /* Chained filter chips */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 4px 6px 4px 10px;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    background: rgba(57,255,20,0.05);
+  }
+  .chip.chip-exclude {
+    border-color: rgba(255,107,107,0.5);
+    color: #ff6b6b;
+    background: rgba(255,107,107,0.05);
+  }
+  .chip-remove {
+    cursor: pointer;
+    border: 1px solid currentColor;
+    padding: 0 5px;
+    line-height: 1.4;
+  }
+  .chip-remove:hover {
+    background: currentColor;
+    color: var(--bg, #050800);
+  }
+
+  /* Category group headers (Group By Category view) */
+  .category-group-header {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    border-bottom: 1px solid var(--green-dim);
+    padding: 10px 4px 4px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+  }
+  .category-group-header:hover {
+    color: var(--green-mid);
+  }
+  .category-group-header:first-child {
+    margin-top: 0;
+  }
+  .group-chevron {
+    display: inline-block;
+    width: 12px;
+  }
+
   .hint {
     font-size: 11px;
     color: var(--text-dim);
@@ -501,7 +558,7 @@
     <div class="corner-tl"></div><div class="corner-tr"></div>
     <div class="corner-bl"></div><div class="corner-br"></div>
     <div class="title">NEXUS // TRACKER ENHANCED</div>
-    <div class="subtitle">TRACKED MOD SEARCH TERMINAL &nbsp;|&nbsp; V1.1.0</div>
+    <div class="subtitle">TRACKED MOD SEARCH TERMINAL &nbsp;|&nbsp; V1.2.0</div>
   </header>
 
   <!-- API KEY PANEL -->
@@ -518,7 +575,7 @@
     </div>
     <div class="hint">
       Get your personal API key from <strong>nexusmods.com → Settings → API Keys</strong> (under "Personal API Key").<br>
-      🔒 This page is served over <strong>HTTPS</strong> &nbsp;·&nbsp; Your key is sent <strong>directly to NexusMods only</strong> — nowhere else &nbsp;·&nbsp; It is <strong>not saved</strong> anywhere and disappears when you close this tab.
+      🔒 This page is served over <strong>HTTPS</strong> &nbsp;·&nbsp; Your key is sent <strong>directly to NexusMods only</strong> - nowhere else &nbsp;·&nbsp; It is <strong>not saved</strong> anywhere and disappears when you close this tab.
     </div>
     <!-- FIX: aria-live="polite" so screen readers announce status changes -->
     <div class="log" id="statusLog" aria-live="polite">&nbsp;</div>
@@ -528,19 +585,50 @@
   <div class="panel" id="searchPanel" style="display:none">
     <div class="panel-label">SEARCH &amp; FILTER</div>
     <div class="search-row">
-      <!-- FIX: placeholder updated to reflect author search support -->
-      <input type="text" id="searchInput" placeholder="SEARCH MOD NAMES OR AUTHORS..." oninput="applyFilters()" />
+      <!-- FIX: placeholder updated to reflect scope + mode controls below -->
+      <input type="text" id="searchInput" placeholder="SEARCH..." oninput="applyFilters()" onkeydown="if(event.key==='Enter') addFilterChip();" />
       <select id="gameFilter" onchange="applyFilters()">
         <option value="">ALL GAMES</option>
       </select>
+      <select id="categoryFilter" onchange="applyFilters()">
+        <option value="">ALL CATEGORIES</option>
+      </select>
       <button class="btn btn-sm" onclick="document.getElementById('searchInput').value=''; applyFilters()">✕ CLEAR</button>
     </div>
+
+    <!-- NEW: search scope (which fields to match against) + include/exclude mode -->
+    <div class="sort-row" style="margin-bottom: 12px;">
+      SEARCH IN:
+      <button class="btn btn-sm active" id="scopeName" onclick="toggleScope('name')">TITLE</button>
+      <button class="btn btn-sm active" id="scopeDescription" onclick="toggleScope('description')">DESCRIPTION</button>
+      <button class="btn btn-sm active" id="scopeAuthor" onclick="toggleScope('author')">AUTHOR</button>
+      &nbsp;&nbsp;MODE:
+      <button class="btn btn-sm active" id="searchModeInclude" onclick="setSearchMode('include')">✓ INCLUDE</button>
+      <button class="btn btn-sm" id="searchModeExclude" onclick="setSearchMode('exclude')">✕ EXCLUDE</button>
+      &nbsp;&nbsp;
+      <button class="btn btn-sm" onclick="addFilterChip()">+ ADD FILTER</button>
+    </div>
+
+    <!-- NEW: chained filter chips - each is a locked-in include/exclude condition -->
+    <div class="chip-row" id="chipRow" style="display:none"></div>
 
     <!-- NEW: Fallout 4 quick-filter + show removed toggle -->
     <div class="sort-row" style="margin-bottom: 12px;">
       QUICK FILTER:
       <button class="btn btn-sm btn-fo4" id="fo4FilterBtn" onclick="toggleFO4Filter()">⚡ FALLOUT 4 ONLY</button>
       <button class="btn btn-sm btn-removed" id="showRemovedBtn" onclick="toggleShowRemoved()">✕ SHOW REMOVED</button>
+      &nbsp;&nbsp;
+      <button class="btn btn-sm" id="groupByCategoryBtn" onclick="toggleGroupByCategory()">☰ GROUP BY CATEGORY</button>
+      <button class="btn btn-sm" id="collapseAllBtn" onclick="collapseAllGroups()" style="display:none">▸ COLLAPSE ALL</button>
+      <button class="btn btn-sm" id="expandAllBtn" onclick="expandAllGroups()" style="display:none">▾ EXPAND ALL</button>
+    </div>
+
+    <!-- NEW: Adult content control -->
+    <div class="sort-row" style="margin-bottom: 12px;">
+      ADULT CONTENT:
+      <button class="btn btn-sm active" id="adultModeAll" onclick="setAdultMode('all')">ALL</button>
+      <button class="btn btn-sm" id="adultModeHide" onclick="setAdultMode('hide')">✕ HIDE ADULT</button>
+      <button class="btn btn-sm" id="adultModeOnly" onclick="setAdultMode('only')">◆ ADULT ONLY</button>
     </div>
 
     <div class="stats-bar">
@@ -569,7 +657,7 @@
   <!-- FOOTER -->
   <div class="footer">
     <span id="footerStatus">NO MODS LOADED</span>
-    <span>BY <a href="https://www.nexusmods.com/profile/viabledahlia" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:1px;">VIABLE DAHLIA</a> · CC BY 4.0 · <span class="cursor-blink">█</span></span>
+    <span>BY <a href="https://www.nexusmods.com/profile/viabledahlia" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:1px;">VIABLE DAHLIA</a> · <a href="https://viabledahlia.github.io/commonwealth-tools/" target="_blank" style="color:var(--text-dim);text-decoration:none;letter-spacing:1px;">COMMONWEALTH TOOLS</a> · CC BY 4.0 · <span class="cursor-blink">█</span></span>
   </div>
 
 </div>
@@ -581,6 +669,14 @@
   let fetching = false;
   let fo4FilterActive = false;
   let showRemoved = false;
+  let adultMode = 'all'; // 'all' | 'hide' | 'only'
+  let searchScope = { name: true, description: true, author: true };
+  let searchMode = 'include'; // 'include' | 'exclude'
+  let filterChips = []; // [{id, term, scope:{name,description,author}, mode:'include'|'exclude'}]
+  let nextChipId = 1;
+  let groupByCategory = false;
+  let collapsedGroups = new Set(); // category labels currently collapsed
+  let groupKeyMap = []; // index -> group name for the most recent grouped render
 
   function toggleKey() {
     const inp = document.getElementById('apiKey');
@@ -622,6 +718,128 @@
     applyFilters();
   }
 
+  // NEW: Group the list by category instead of one flat list
+  function toggleGroupByCategory() {
+    groupByCategory = !groupByCategory;
+    document.getElementById('groupByCategoryBtn').classList.toggle('active', groupByCategory);
+    document.getElementById('collapseAllBtn').style.display = groupByCategory ? 'inline-block' : 'none';
+    document.getElementById('expandAllBtn').style.display = groupByCategory ? 'inline-block' : 'none';
+    applyFilters();
+  }
+
+  // NEW: Collapse/expand a single category group (called with an index into
+  // groupKeyMap, set fresh on every grouped render).
+  function toggleGroupCollapse(idx) {
+    const name = groupKeyMap[idx];
+    if (collapsedGroups.has(name)) collapsedGroups.delete(name);
+    else collapsedGroups.add(name);
+    applyFilters();
+  }
+
+  function collapseAllGroups() {
+    groupKeyMap.forEach(name => collapsedGroups.add(name));
+    applyFilters();
+  }
+
+  function expandAllGroups() {
+    collapsedGroups.clear();
+    applyFilters();
+  }
+
+  // NEW: Adult content control (All / Hide adult / Adult only)
+  function setAdultMode(mode) {
+    adultMode = mode;
+    document.getElementById('adultModeAll').classList.toggle('active', mode === 'all');
+    document.getElementById('adultModeHide').classList.toggle('active', mode === 'hide');
+    document.getElementById('adultModeOnly').classList.toggle('active', mode === 'only');
+    applyFilters();
+  }
+
+  // NEW: Click a scope button to search ONLY that field. Clicking the same
+  // button again (when it's already the sole active scope) goes back to
+  // searching everywhere. This is deterministic regardless of prior clicks -
+  // clicking TITLE always means "title only," never depends on what was
+  // clicked before it.
+  function toggleScope(field) {
+    const isSoleActive = searchScope[field] &&
+      Object.entries(searchScope).every(([k, v]) => k === field ? v : !v);
+
+    if (isSoleActive) {
+      searchScope = { name: true, description: true, author: true };
+    } else {
+      searchScope = { name: false, description: false, author: false };
+      searchScope[field] = true;
+    }
+
+    document.getElementById('scopeName').classList.toggle('active', searchScope.name);
+    document.getElementById('scopeDescription').classList.toggle('active', searchScope.description);
+    document.getElementById('scopeAuthor').classList.toggle('active', searchScope.author);
+    applyFilters();
+  }
+
+  // NEW: Search mode - INCLUDE keeps matches, EXCLUDE hides them
+  function setSearchMode(mode) {
+    searchMode = mode;
+    document.getElementById('searchModeInclude').classList.toggle('active', mode === 'include');
+    document.getElementById('searchModeExclude').classList.toggle('active', mode === 'exclude');
+    applyFilters();
+  }
+
+  // NEW: does a mod satisfy one search condition (used for both the live
+  // search box and each locked-in chip)?
+  function conditionMatches(m, cond) {
+    const term = cond.term.toLowerCase();
+    if (!term) return true;
+    const hit =
+      (cond.scope.name && m.name.toLowerCase().includes(term)) ||
+      (cond.scope.description && m.description.toLowerCase().includes(term)) ||
+      (cond.scope.author && m.author.toLowerCase().includes(term));
+    return cond.mode === 'include' ? hit : !hit;
+  }
+
+  // NEW: lock the current search box term + scope + mode in as a permanent
+  // chip, then clear the box so another condition can be chained on top.
+  function addFilterChip() {
+    const term = document.getElementById('searchInput').value.trim();
+    if (!term) return;
+    filterChips.push({
+      id: nextChipId++,
+      term,
+      scope: { ...searchScope },
+      mode: searchMode
+    });
+    document.getElementById('searchInput').value = '';
+    renderChips();
+    applyFilters();
+  }
+
+  function removeFilterChip(id) {
+    filterChips = filterChips.filter(c => c.id !== id);
+    renderChips();
+    applyFilters();
+  }
+
+  function renderChips() {
+    const row = document.getElementById('chipRow');
+    if (filterChips.length === 0) {
+      row.style.display = 'none';
+      row.innerHTML = '';
+      return;
+    }
+    row.style.display = 'flex';
+    row.innerHTML = filterChips.map(c => {
+      const scopeLabel = ['name', 'description', 'author']
+        .filter(f => c.scope[f])
+        .map(f => f === 'description' ? 'DESC' : f.toUpperCase().slice(0, 4))
+        .join('+');
+      const icon = c.mode === 'include' ? '✓' : '✕';
+      return `<div class="chip${c.mode === 'exclude' ? ' chip-exclude' : ''}">
+        ${icon} "${sanitize(c.term)}" <span style="opacity:0.6">(${scopeLabel})</span>
+        <span class="chip-remove" onclick="removeFilterChip(${c.id})">✕</span>
+      </div>`;
+    }).join('');
+  }
+
   async function startFetch() {
     const key = document.getElementById('apiKey').value.trim();
     if (!key) { setLog('⚠ NO API KEY ENTERED', 'err'); return; }
@@ -640,11 +858,11 @@
           apikey: key,
           Accept: 'application/json',
           'Application-Name': 'CommonwealthTools-NexusTrackerEnhanced',
-          'Application-Version': '1.1.0'
+          'Application-Version': '1.2.0'
         }
       });
 
-      if (res.status === 401) { setLog('✕ INVALID API KEY — CHECK AND RETRY', 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
+      if (res.status === 401) { setLog('✕ INVALID API KEY - CHECK AND RETRY', 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
       if (!res.ok) { setLog('✕ API ERROR: ' + res.status + ' ' + res.statusText, 'err'); fetching=false; document.getElementById('fetchBtn').disabled=false; return; }
 
       const tracked = await res.json();
@@ -653,16 +871,17 @@
         fetching=false; document.getElementById('fetchBtn').disabled=false; return;
       }
 
-      setLog('✓ FOUND ' + tracked.length + ' TRACKED ENTRIES — FETCHING DETAILS...', 'ok');
+      setLog('✓ FOUND ' + tracked.length + ' TRACKED ENTRIES - FETCHING DETAILS...', 'ok');
       document.getElementById('searchPanel').style.display = 'block';
       document.getElementById('loadingTag').style.display = 'flex';
       document.getElementById('progressWrap').style.display = 'block';
       document.getElementById('clearBtn').style.display = 'inline-block';
       document.getElementById('countTotal').textContent = tracked.length;
 
-      // Fetch mod details in batches of 10 with small delay
-      const BATCH = 10;
-      const DELAY = 250; // ms between batches
+      // Fetch mod details in larger batches, no artificial delay between them.
+      // NexusMods' current limit is 500 requests/hour, so this stays well
+      // within bounds even for large tracked lists.
+      const BATCH = 20;
 
       for (let i = 0; i < tracked.length; i += BATCH) {
         const batch = tracked.slice(i, i + BATCH);
@@ -671,17 +890,19 @@
         document.getElementById('progressFill').style.width = pct + '%';
         document.getElementById('progressLabel').textContent = 'FETCHING MOD DETAILS... ' + Math.min(i+BATCH, tracked.length) + ' / ' + tracked.length;
         applyFilters();
-        if (i + BATCH < tracked.length) await sleep(DELAY);
       }
 
       document.getElementById('progressWrap').style.display = 'none';
       document.getElementById('loadingTag').style.display = 'none';
       const removedCount = allMods.filter(m => m.removed).length;
       const loadedMsg = removedCount > 0
-        ? `✓ ${allMods.length} MODS LOADED — ${removedCount} REMOVED`
+        ? `✓ ${allMods.length} MODS LOADED - ${removedCount} REMOVED`
         : `✓ ALL ${allMods.length} MODS LOADED SUCCESSFULLY`;
       setLog(loadedMsg, removedCount > 0 ? 'warn' : 'ok');
       document.getElementById('footerStatus').textContent = allMods.length + ' MODS LOADED · NEXUSMODS API';
+      // FIX: flip fetching off before this render, so the list settles into
+      // its proper sorted order now that loading is done.
+      fetching = false;
       applyFilters();
 
     } catch (e) {
@@ -697,6 +918,60 @@
     return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  // Strips NexusMods' BBCode markup from descriptions so it reads cleanly
+  // and searches sensibly (we never render this as HTML, only search it).
+  function stripBBCode(str) {
+    return (str || '')
+      .replace(/\[\/?[a-z0-9=%#"'\s:.,/-]*\]/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // Fallout 4 category_id -> name lookup. Nexus removed the API endpoint that
+  // used to resolve this, so this table is a static snapshot - updated by
+  // hand from time to time via a Mod Organizer 2 categories.dat.
+  // NOTE: the first table we tried (Nexus mod #91100) used a completely
+  // different, much larger numbering scheme that didn't match what the live
+  // API actually returns for Fallout 4 (confirmed against real tracked mods
+  // - the API returns small IDs in the 1-70 range, matching Skyrim SE's
+  // scale). This table replaces that one entirely. IDs 49, 54, 60, 64-67,
+  // 78, and 102+ aren't covered yet - those will just show as "Category N"
+  // until confirmed.
+  const FO4_CATEGORIES = {
+    1: 'Fallout 4', 2: 'Miscellaneous', 3: 'Ammo', 4: 'Animation',
+    5: 'Armour', 6: 'Bug Fixes', 7: 'Buildings', 8: 'Cheats and God items',
+    9: 'Clothing', 10: 'Collectibles, Treasure Hunts, and Puzzles',
+    11: 'Companions', 12: 'Creatures', 13: 'ENB Presets', 14: 'Environment',
+    15: 'Gameplay', 16: 'Factions', 17: 'Body, Face, and Hair',
+    18: 'Modders Resources and Tutorials', 19: 'Models and Textures',
+    20: 'New Lands', 21: 'Locations - New', 22: 'NPC', 23: 'NPC - Vendors',
+    24: 'Overhauls', 25: 'Patches', 26: 'Performance', 27: 'Perks',
+    28: 'Player Homes', 29: 'Poses', 30: 'Quests and Adventures',
+    31: 'Radio', 32: 'Saved Games', 33: 'Audio - SFX', 34: 'Audio - Music',
+    35: 'Audio - Misc', 36: 'Audio - Voice', 37: 'User Interface',
+    38: 'Utilities', 39: 'Vehicles', 40: 'Visuals and Graphics',
+    41: 'Weapons', 42: 'Weapons and Armour',
+    43: 'Items (Food, Drinks, Chems, etc)', 44: 'Crafting - Equipment',
+    45: 'Crafting - Home/Settlement', 46: 'Skills and Leveling',
+    47: 'Locations - Vanilla', 48: 'Player Settlement',
+    50: 'Crafting - Other', 51: 'Immersion', 52: 'Pip-Boy',
+    53: 'Power Armour', 55: 'ReShade Presets', 56: 'Weather and Lighting',
+    57: 'Tattoos', 58: 'Character Presets', 59: 'Videos and Trailers',
+    61: 'Transfer Settlement Blueprints', 62: 'VR', 63: 'Sim Settlements',
+    68: 'Sim Settlements 2'
+  };
+
+  // Resolves a mod's category to a readable name. Only Fallout 4 has a
+  // lookup table right now, so other games - and any unrecognised Fallout 4
+  // ID - fall back to a "Category N" label rather than guessing.
+  function categoryLabel(m) {
+    if (!m.category) return null;
+    if (m.game === 'fallout4' && FO4_CATEGORIES[m.category]) {
+      return FO4_CATEGORIES[m.category];
+    }
+    return `Category ${m.category}`;
+  }
+
   async function fetchModDetail(tracked, key) {
     try {
       const url = `https://api.nexusmods.com/v1/games/${tracked.domain_name}/mods/${tracked.mod_id}.json`;
@@ -705,16 +980,16 @@
           apikey: key,
           Accept: 'application/json',
           'Application-Name': 'CommonwealthTools-NexusTrackerEnhanced',
-          'Application-Version': '1.1.0'
+          'Application-Version': '1.2.0'
         }
       });
       if (!r.ok) {
-        // Hard failure (network/auth issue) — not flagged as removed
+        // Hard failure (network/auth issue) - not flagged as removed
         allMods.push({
           id: tracked.mod_id,
           game: tracked.domain_name,
           name: '[MOD #' + tracked.mod_id + ']',
-          summary: '', author: '', version: '',
+          summary: '', description: '', author: '', version: '', adult: false, category: null,
           url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
           removed: false
         });
@@ -730,8 +1005,11 @@
           ? '[MOD #' + tracked.mod_id + ']'
           : sanitize(d.name || ('[MOD #' + tracked.mod_id + ']')),
         summary: sanitize(d.summary || ''),
+        description: sanitize(stripBBCode(d.description || '')),
         author: sanitize(d.uploaded_by || ''),
         version: sanitize(d.version || ''),
+        adult: !!d.contains_adult_content,
+        category: d.category_id || null,
         url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
         removed: isRemoved
       });
@@ -740,7 +1018,7 @@
         id: tracked.mod_id,
         game: tracked.domain_name,
         name: '[MOD #' + tracked.mod_id + ']',
-        summary: '', author: '', version: '',
+        summary: '', description: '', author: '', version: '', adult: false, category: null,
         url: `https://www.nexusmods.com/${tracked.domain_name}/mods/${tracked.mod_id}`,
         removed: false
       });
@@ -754,6 +1032,7 @@
 
     // FIX: read the current game selection BEFORE rebuilding the dropdown
     const prev = document.getElementById('gameFilter').value;
+    const prevCategory = document.getElementById('categoryFilter').value;
 
     // Sync fo4FilterActive state with dropdown
     fo4FilterActive = (prev === 'fallout4');
@@ -765,29 +1044,48 @@
     sel.innerHTML = '<option value="">ALL GAMES</option>' + games.map(g => `<option value="${g}"${g===prev?' selected':''}>${formatGame(g)}</option>`).join('');
     document.getElementById('countGames').textContent = games.length;
 
+    // Update category dropdown (resolved names where we have them, "Category N" otherwise)
+    const categories = [...new Set(allMods.filter(m => !m.removed).map(m => categoryLabel(m)).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b));
+    const catSel = document.getElementById('categoryFilter');
+    catSel.innerHTML = '<option value="">ALL CATEGORIES</option>' + categories.map(c => `<option value="${sanitize(c)}"${c===prevCategory?' selected':''}>${sanitize(c)}</option>`).join('');
+
     // Update removed count stat
     const removedCount = allMods.filter(m => m.removed).length;
     document.getElementById('countRemoved').textContent = removedCount;
     document.getElementById('removedStat').style.display = removedCount > 0 ? 'flex' : 'none';
 
     // FIX: filter using `prev` (stable value), not a re-read of the rebuilt dropdown
-    // FIX: also search by author, not just name
+    // Search now matches against whichever scopes are active (title/description/author),
+    // can either keep matches (include) or hide them (exclude), and any number of
+    // locked-in chips are ANDed together with the live search box.
     let filtered = allMods.filter(m => {
       if (m.removed && !showRemoved) return false;
       if (!m.removed && prev && m.game !== prev) return false;
-      if (q && !m.name.toLowerCase().includes(q) && !m.author.toLowerCase().includes(q)) return false;
+      if (!m.removed && prevCategory && categoryLabel(m) !== prevCategory) return false;
+      if (adultMode === 'hide' && m.adult) return false;
+      if (adultMode === 'only' && !m.adult) return false;
+      if (q && !conditionMatches(m, { term: q, scope: searchScope, mode: searchMode })) return false;
+      for (const chip of filterChips) {
+        if (!conditionMatches(m, chip)) return false;
+      }
       return true;
     });
 
-    // Sort — removed mods always sort to the bottom
-    filtered.sort((a, b) => {
-      if (a.removed !== b.removed) return a.removed ? 1 : -1;
-      let va = sortField === 'game' ? a.game : a.name.toLowerCase();
-      let vb = sortField === 'game' ? b.game : b.name.toLowerCase();
-      if (va < vb) return sortAsc ? -1 : 1;
-      if (va > vb) return sortAsc ? 1 : -1;
-      return 0;
-    });
+    // Sort - removed mods always sort to the bottom.
+    // FIX: skip sorting while still fetching, so the list doesn't reshuffle
+    // under the user's cursor every time a new batch of mods arrives.
+    // It settles into its proper sorted order once loading finishes.
+    if (!fetching) {
+      filtered.sort((a, b) => {
+        if (a.removed !== b.removed) return a.removed ? 1 : -1;
+        let va = sortField === 'game' ? a.game : a.name.toLowerCase();
+        let vb = sortField === 'game' ? b.game : b.name.toLowerCase();
+        if (va < vb) return sortAsc ? -1 : 1;
+        if (va > vb) return sortAsc ? 1 : -1;
+        return 0;
+      });
+    }
 
     document.getElementById('countShown').textContent = filtered.length;
     // FIX: countTotal shows active (non-removed) mods only
@@ -799,24 +1097,66 @@
       return;
     }
 
-    list.innerHTML = filtered.map(m => {
-      // Highlight matches in name and author
-      const nameHtml = q ? m.name.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.name;
-      const authorHtml = q && m.author ? m.author.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.author;
-      const meta = [authorHtml ? 'BY: ' + authorHtml : '', m.version ? 'v' + m.version : ''].filter(Boolean).join('  ·  ');
-      const rightBadge = m.removed
-        ? `<div class="badge-removed">REMOVED</div>`
-        : `<div class="mod-game-badge">${formatGame(m.game)}</div>`;
-      return `
-        <div class="mod-item${m.removed ? ' is-removed' : ''}">
-          <div>
-            <div class="mod-name">${nameHtml}</div>
-            ${meta ? `<div class="mod-meta">${meta}</div>` : ''}
-            ${m.url ? `<a class="mod-link" href="${m.url}" target="_blank" rel="noopener">↗ ${m.removed ? 'VIEW ON NEXUSMODS · UNTRACK THIS MOD' : 'VIEW ON NEXUSMODS'}</a>` : ''}
+    if (groupByCategory) {
+      // Split into removed / not-removed, group the rest by category label,
+      // sort group names alphabetically, and put removed mods in their own
+      // trailing group so they stay visually separate either way.
+      const active = filtered.filter(m => !m.removed);
+      const removed = filtered.filter(m => m.removed);
+      const groups = new Map();
+      for (const m of active) {
+        const label = categoryLabel(m) || 'Uncategorised';
+        if (!groups.has(label)) groups.set(label, []);
+        groups.get(label).push(m);
+      }
+      const groupNames = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+      if (removed.length) groupNames.push('REMOVED');
+      // Index-based keys (rather than the raw name) sidestep quoting issues
+      // for category names containing commas, parentheses, apostrophes etc.
+      groupKeyMap = groupNames;
+      let html = groupNames.map((name, idx) => {
+        const items = name === 'REMOVED' ? removed : groups.get(name);
+        const isCollapsed = collapsedGroups.has(name);
+        return `
+          <div class="category-group-header" onclick="toggleGroupCollapse(${idx})">
+            <span class="group-chevron">${isCollapsed ? '▸' : '▾'}</span>
+            ${sanitize(name)} <span style="opacity:0.6">(${items.length})</span>
           </div>
-          ${rightBadge}
-        </div>`;
-    }).join('');
+          <div class="category-group-items"${isCollapsed ? ' style="display:none"' : ''}>
+            ${items.map(m => renderModItem(m, q)).join('')}
+          </div>
+        `;
+      }).join('');
+      list.innerHTML = html;
+    } else {
+      list.innerHTML = filtered.map(m => renderModItem(m, q)).join('');
+    }
+  }
+
+  // Builds the HTML for a single mod row - shared by the flat list and the
+  // grouped-by-category view so both stay in sync.
+  function renderModItem(m, q) {
+    // Highlight matches in name and author - only in include mode and
+    // only for scopes that are actually active (no point highlighting a
+    // field the user has excluded from the search).
+    const highlight = q && searchMode === 'include';
+    const nameHtml = (highlight && searchScope.name)
+      ? m.name.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.name;
+    const authorHtml = (highlight && searchScope.author && m.author)
+      ? m.author.replace(new RegExp('(' + escapeRe(q) + ')', 'gi'), '<mark>$1</mark>') : m.author;
+    const meta = [authorHtml ? 'BY: ' + authorHtml : '', m.version ? 'v' + m.version : ''].filter(Boolean).join('  ·  ');
+    const rightBadge = m.removed
+      ? `<div class="badge-removed">REMOVED</div>`
+      : `<div class="mod-game-badge">${formatGame(m.game)}${m.adult ? ' · <span style="color:#ff6b6b">ADULT</span>' : ''}</div>`;
+    return `
+      <div class="mod-item${m.removed ? ' is-removed' : ''}">
+        <div>
+          <div class="mod-name">${nameHtml}</div>
+          ${meta ? `<div class="mod-meta">${meta}</div>` : ''}
+          ${m.url ? `<a class="mod-link" href="${m.url}" target="_blank" rel="noopener">↗ ${m.removed ? 'VIEW ON NEXUSMODS · UNTRACK THIS MOD' : 'VIEW ON NEXUSMODS'}</a>` : ''}
+        </div>
+        ${rightBadge}
+      </div>`;
   }
 
   function formatGame(domain) {
@@ -844,10 +1184,31 @@
     fetching = false;
     fo4FilterActive = false;
     showRemoved = false;
+    adultMode = 'all';
+    searchScope = { name: true, description: true, author: true };
+    searchMode = 'include';
+    filterChips = [];
+    groupByCategory = false;
+    collapsedGroups.clear();
+    groupKeyMap = [];
+    document.getElementById('groupByCategoryBtn').classList.remove('active');
+    document.getElementById('collapseAllBtn').style.display = 'none';
+    document.getElementById('expandAllBtn').style.display = 'none';
+    document.getElementById('categoryFilter').innerHTML = '<option value="">ALL CATEGORIES</option>';
     document.getElementById('fo4FilterBtn').classList.remove('active');
     document.getElementById('showRemovedBtn').classList.remove('active');
     document.getElementById('showRemovedBtn').textContent = '✕ SHOW REMOVED';
     document.getElementById('removedStat').style.display = 'none';
+    document.getElementById('adultModeAll').classList.add('active');
+    document.getElementById('adultModeHide').classList.remove('active');
+    document.getElementById('adultModeOnly').classList.remove('active');
+    document.getElementById('scopeName').classList.add('active');
+    document.getElementById('scopeDescription').classList.add('active');
+    document.getElementById('scopeAuthor').classList.add('active');
+    document.getElementById('searchModeInclude').classList.add('active');
+    document.getElementById('searchModeExclude').classList.remove('active');
+    document.getElementById('searchInput').value = '';
+    renderChips();
     document.getElementById('searchPanel').style.display = 'none';
     document.getElementById('clearBtn').style.display = 'none';
     document.getElementById('apiKey').value = '';
