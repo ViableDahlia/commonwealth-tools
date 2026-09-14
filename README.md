@@ -10,14 +10,24 @@ No installs. No accounts. No data sent anywhere except where you choose.
 
 ## Tools
 
-### [MO2 Mod List Reader](./mo2-modlist/)
+### [Transfer Settlements Blueprint Toolkit](https://github.com/ViableDahlia/commonwealth-tools/blob/main/transfer-settlements-blueprint-toolkit)
+
+Visualise, organise, and edit [Transfer Settlements](https://www.nexusmods.com/fallout4/mods/34032) settlement blueprints in your browser. Load a blueprint, switch between two integrated tools without reloading: edit mode to remove objects and export a filtered copy, or analyse mode to visualise placement and understand mod dependencies.
+
+**[Open tool →](https://viabledahlia.github.io/commonwealth-tools/transfer-settlements-blueprint-toolkit/)**
+
+---
+
+### [MO2 Mod List Reader](https://github.com/ViableDahlia/commonwealth-tools/blob/main/mo2-modlist)
+
 Read and explore your Mod Organizer 2 mod list directly in the browser. Drag in your `modlist.txt` to search, filter, and sort your full mod list by name, priority, or status - without opening MO2.
 
 **[Open tool →](https://viabledahlia.github.io/commonwealth-tools/mo2-modlist/)**
 
 ---
 
-### [Nexus Tracker Enhanced](./nexus-tracker-enhanced/)
+### [Nexus Tracker Enhanced](https://github.com/ViableDahlia/commonwealth-tools/blob/main/nexus-tracker-enhanced)
+
 Browse your NexusMods tracked mod list in the browser. Connect with your personal API key to search by name or author, filter by game, and identify mods that have been removed or hidden.
 
 **[Open tool →](https://viabledahlia.github.io/commonwealth-tools/nexus-tracker-enhanced/)**
@@ -26,7 +36,8 @@ Browse your NexusMods tracked mod list in the browser. Connect with your persona
 
 ---
 
-### [VD Conflict Analyser](./conflict-analyser/)
+### [VD Conflict Analyser](https://github.com/ViableDahlia/commonwealth-tools/blob/main/conflict-analyser)
+
 Visualise and analyse plugin conflicts from xEdit. Upload your conflict export (TSV) to explore conflicts by FormID, identify winning/losing overrides, and understand load order impact at a glance.
 
 Works offline, no installation required. Integrates with [VD Isolate Export Conflicts](https://github.com/ViableDahlia/xedit-scripts) xEdit script.
@@ -35,7 +46,8 @@ Works offline, no installation required. Integrates with [VD Isolate Export Conf
 
 ---
 
-### [Plugin Viewer](./plugin-viewer/)
+### [Plugin Viewer](https://github.com/ViableDahlia/commonwealth-tools/blob/main/plugin-viewer)
+
 Drop in a `.esp` / `.esm` / `.esl` and see exactly what it contains and does. Decodes and decompresses the plugin entirely in your browser to show record composition by type, new content created vs. records overridden from a master, and heuristic warnings for previs/precombine and LOD impact.
 
 Works fully offline once loaded, no installation or upload required - the file never leaves your machine. Uses [pako](https://github.com/nodeca/pako) (MIT licensed) for zlib inflate, bundled locally.
@@ -56,11 +68,12 @@ Made by **Viable Dahlia**, a Fallout 4 settlement builder focused on architectur
 
 Code in this repository is licensed on a per-tool basis.
 
-| Tool | License |
-|---|---|
-| MO2 Mod List Reader | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
-| Nexus Tracker Enhanced | [MIT](./nexus-tracker-enhanced/LICENSE) |
-| VD Conflict Analyser | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
-| Plugin Viewer | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (bundles [pako](https://github.com/nodeca/pako), MIT licensed) |
+| Tool                                   | License                                                                                                                  |
+| ---------------------------------------| ------------------------------------------------------------------------------------------------------------------------ |
+| Transfer Settlements Blueprint Toolkit | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                                                                |
+| MO2 Mod List Reader                    | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                                                                |
+| Nexus Tracker Enhanced                 | [MIT](https://github.com/ViableDahlia/commonwealth-tools/blob/main/nexus-tracker-enhanced/LICENSE)                      |
+| VD Conflict Analyser                   | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                                                                |
+| Plugin Viewer                          | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (bundles [pako](https://github.com/nodeca/pako), MIT licensed) |
 
 See each tool's folder for its individual licence file.
