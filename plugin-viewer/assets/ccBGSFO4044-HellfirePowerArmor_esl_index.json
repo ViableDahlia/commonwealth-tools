@@ -1,0 +1,1412 @@
+{
+  "000812": [
+    "ccBGSFO4044_ma_PA_Hellfire",
+    "",
+    "KYWD"
+  ],
+  "000813": [
+    "ccBGSFO4044_ma_Hellfire_Helmet",
+    "",
+    "KYWD"
+  ],
+  "000002": [
+    "if_tmp_PA_EnclavePaint",
+    "",
+    "KYWD"
+  ],
+  "000814": [
+    "ccBGSFO4044_ma_Hellfire_LArm",
+    "",
+    "KYWD"
+  ],
+  "000815": [
+    "ccBGSFO4044_ma_Hellfire_LLeg",
+    "",
+    "KYWD"
+  ],
+  "000816": [
+    "ccBGSFO4044_ma_Hellfire_RArm",
+    "",
+    "KYWD"
+  ],
+  "00080E": [
+    "ccBGSFO4044_ma_Hellfire_RLeg",
+    "",
+    "KYWD"
+  ],
+  "00080F": [
+    "ccBGSFO4044_ma_Hellfire_Torso",
+    "",
+    "KYWD"
+  ],
+  "000810": [
+    "ccBGSFO4044_ma_PA_Hellfire_Material",
+    "",
+    "KYWD"
+  ],
+  "000805": [
+    "ccBGSFO4044_Armor_Power_Hellfire_Helm",
+    "Hellfire Helm",
+    "ARMO"
+  ],
+  "000804": [
+    "ccBGSFO4044_Armor_Power_Hellfire_LegLeft",
+    "Hellfire Left Leg",
+    "ARMO"
+  ],
+  "000800": [
+    "ccBGSFO4044_Armor_Power_Hellfire_ArmLeft",
+    "Hellfire Left Arm",
+    "ARMO"
+  ],
+  "000801": [
+    "ccBGSFO4044_Armor_Power_Hellfire_LegRight",
+    "Hellfire Right Leg",
+    "ARMO"
+  ],
+  "000802": [
+    "ccBGSFO4044_Armor_Power_Hellfire_ArmRight",
+    "Hellfire Right Arm",
+    "ARMO"
+  ],
+  "000803": [
+    "ccBGSFO4044_Armor_Power_Hellfire_Torso",
+    "Hellfire Torso",
+    "ARMO"
+  ],
+  "00082D": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Shock",
+    "Hellfire Hellfire EMP Shielding",
+    "MISC"
+  ],
+  "00082E": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Rad",
+    "Hellfire Lead Plating",
+    "MISC"
+  ],
+  "00082F": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Explosives",
+    "Hellfire Explosive Shielding",
+    "MISC"
+  ],
+  "000830": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Energy",
+    "Hellfire Prism Shielding",
+    "MISC"
+  ],
+  "000831": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_APSunRegen",
+    "Hellfire Photovoltaic Coating",
+    "MISC"
+  ],
+  "000832": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Misc_SprintBoost",
+    "Hellfire Overdrive Servos",
+    "MISC"
+  ],
+  "000833": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Misc_OptimizedServos",
+    "Hellfire Optimized Servos",
+    "MISC"
+  ],
+  "000834": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Misc_ExplVent",
+    "Hellfire Explosive Vent",
+    "MISC"
+  ],
+  "000835": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Misc_Carry",
+    "Hellfire Calibrated Shocks",
+    "MISC"
+  ],
+  "000836": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Misc_APRegen",
+    "Hellfire Kinetic Servos",
+    "MISC"
+  ],
+  "000837": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_VATSChance",
+    "Hellfire VATS Matrix Overlay",
+    "MISC"
+  ],
+  "000838": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_Sensor",
+    "Hellfire Sensor Array",
+    "MISC"
+  ],
+  "000839": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_RadScrubbers",
+    "Hellfire Rad Scrubbers",
+    "MISC"
+  ],
+  "00083A": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp_Vaultboy",
+    "Hellfire Headlamp VaultBoy",
+    "MISC"
+  ],
+  "00083B": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp_RedTactical",
+    "Hellfire Headlamp Red Tactical",
+    "MISC"
+  ],
+  "00083C": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp_Purple",
+    "Hellfire Headlamp Purple",
+    "MISC"
+  ],
+  "00083D": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp_Bright",
+    "Hellfire Headlamp Bright",
+    "MISC"
+  ],
+  "00083E": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp_Blue",
+    "Hellfire Headlamp Blue",
+    "MISC"
+  ],
+  "00083F": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Headlamp",
+    "Hellfire Headlamp",
+    "MISC"
+  ],
+  "000840": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Misc_Unarmed",
+    "Hellfire Hydraulic Bracers",
+    "MISC"
+  ],
+  "000841": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Misc_ShockDmg",
+    "Hellfire Tesla Bracers",
+    "MISC"
+  ],
+  "000842": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Misc_Optimized",
+    "Hellfire Optimized Bracers",
+    "MISC"
+  ],
+  "000843": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Misc_Bleed",
+    "Hellfire Rusty Knuckles",
+    "MISC"
+  ],
+  "000844": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Tesla",
+    "Hellfire Tesla Coils",
+    "MISC"
+  ],
+  "000845": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_StealthBoy",
+    "Hellfire Stealth Boy",
+    "MISC"
+  ],
+  "000846": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_JetPack",
+    "Hellfire Jet Pack",
+    "MISC"
+  ],
+  "000847": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Lining_F",
+    "Hellfire Mk.VI Torso Lining",
+    "MISC"
+  ],
+  "000848": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Lining_E",
+    "Hellfire Mk.V Torso Lining",
+    "MISC"
+  ],
+  "000849": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Lining_D",
+    "Hellfire Mk.IV Torso Lining",
+    "MISC"
+  ],
+  "00084A": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Lining_C",
+    "Hellfire Mk.III Torso Lining",
+    "MISC"
+  ],
+  "00084B": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Lining_B",
+    "Hellfire Mk.II Torso Lining",
+    "MISC"
+  ],
+  "00084C": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Enclave",
+    "Hellfire Prism Shielding",
+    "MISC"
+  ],
+  "00084D": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Lining_F",
+    "Hellfire Mk.VI Leg Armor",
+    "MISC"
+  ],
+  "00084E": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Lining_E",
+    "Hellfire Mk.V Leg Armor",
+    "MISC"
+  ],
+  "00084F": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Lining_D",
+    "Hellfire Mk.IV Leg Armor",
+    "MISC"
+  ],
+  "000850": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Lining_C",
+    "Hellfire Mk.III Leg Armor",
+    "MISC"
+  ],
+  "000851": [
+    "ccBGSFO4044_miscmod_Hellfire_Leg_Lining_B",
+    "Hellfire Mk.II Leg Armor",
+    "MISC"
+  ],
+  "000817": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_Recon",
+    "Hellfire Recon Sensors",
+    "MISC"
+  ],
+  "000818": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_INT",
+    "Hellfire Internal Database",
+    "MISC"
+  ],
+  "000819": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Misc_DetectLife",
+    "Hellfire Targeting HUD",
+    "MISC"
+  ],
+  "00081A": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Lining_F",
+    "Hellfire Mk.VI Helmet",
+    "MISC"
+  ],
+  "00081B": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Lining_E",
+    "Hellfire Mk.V Helmet",
+    "MISC"
+  ],
+  "00081C": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Lining_D",
+    "Hellfire Mk.IV Helmet",
+    "MISC"
+  ],
+  "00081D": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Lining_C",
+    "Hellfire Mk.III Helmet",
+    "MISC"
+  ],
+  "00081E": [
+    "ccBGSFO4044_miscmod_Hellfire_Helmet_Lining_B",
+    "Hellfire Mk.II Helmet",
+    "MISC"
+  ],
+  "00081F": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Lining_F",
+    "Hellfire Mk.VI Arm Armor",
+    "MISC"
+  ],
+  "000820": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Lining_E",
+    "Hellfire Mk.V Arm Armor",
+    "MISC"
+  ],
+  "000821": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Lining_D",
+    "Hellfire Mk.IV Arm Armor",
+    "MISC"
+  ],
+  "000822": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Lining_C",
+    "Hellfire Mk.III Arm Armor",
+    "MISC"
+  ],
+  "000823": [
+    "ccBGSFO4044_miscmod_Hellfire_Arm_Lining_B",
+    "Hellfire Mk.II Arm Armor",
+    "MISC"
+  ],
+  "000824": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Str",
+    "Hellfire Motion-Assist Servos",
+    "MISC"
+  ],
+  "000825": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Reactive",
+    "Hellfire Reactive Plates",
+    "MISC"
+  ],
+  "000826": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_MedicPump",
+    "Hellfire Medic Pump",
+    "MISC"
+  ],
+  "000827": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Kinetic",
+    "Hellfire Kinetic Dynamo",
+    "MISC"
+  ],
+  "000828": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Emergency",
+    "Hellfire Emergency Protocols",
+    "MISC"
+  ],
+  "000829": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_Cleanser",
+    "Hellfire Blood Cleanser",
+    "MISC"
+  ],
+  "00082A": [
+    "ccBGSFO4044_miscmod_Hellfire_Torso_Misc_BatRegen",
+    "Hellfire Core Assembly",
+    "MISC"
+  ],
+  "00082B": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Titanium",
+    "Hellfire Titanium Plating",
+    "MISC"
+  ],
+  "00082C": [
+    "ccBGSFO4044_miscmod_Hellfire_Material_Thermal",
+    "Hellfire Thermal Coating",
+    "MISC"
+  ],
+  "00090D": [
+    "ccBGSFO4044_PowerArmorHellfire_LoadScreen",
+    "",
+    "STAT"
+  ],
+  "000806": [
+    "ccBGSFO4044_Armor_LvlPowerArmorFurnitureHellfire",
+    "Power Armor",
+    "FURN"
+  ],
+  "000852": [
+    "ccBGSFO4044_LvlForgedBoss_HellfirePowerArmor01",
+    "Pyro",
+    "NPC_"
+  ],
+  "000916": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_LegRight_50",
+    "",
+    "LVLI"
+  ],
+  "000915": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_LegLeft_50",
+    "",
+    "LVLI"
+  ],
+  "000914": [
+    "ccBGSFO4044_LL_Armor_Power_Set",
+    "",
+    "LVLI"
+  ],
+  "00090B": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_BaseGame_Set",
+    "",
+    "LVLI"
+  ],
+  "000855": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Leveled",
+    "",
+    "LVLI"
+  ],
+  "000856": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_F",
+    "",
+    "LVLI"
+  ],
+  "000857": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_C",
+    "",
+    "LVLI"
+  ],
+  "24A3EC": [
+    "cc_LL_Armor_Power_Hellfire_Set",
+    "",
+    "LVLI"
+  ],
+  "000858": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_E",
+    "",
+    "LVLI"
+  ],
+  "000853": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_B",
+    "",
+    "LVLI"
+  ],
+  "000807": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_A",
+    "",
+    "LVLI"
+  ],
+  "00091C": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_A_Partial",
+    "",
+    "LVLI"
+  ],
+  "000854": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_D",
+    "",
+    "LVLI"
+  ],
+  "00000C": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_F_Enclave",
+    "",
+    "LVLI"
+  ],
+  "00000B": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_E_Enclave",
+    "",
+    "LVLI"
+  ],
+  "00000A": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_D_Enclave",
+    "",
+    "LVLI"
+  ],
+  "000009": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_C_Enclave",
+    "",
+    "LVLI"
+  ],
+  "000008": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_B_Enclave",
+    "",
+    "LVLI"
+  ],
+  "000007": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Set_A_Enclave",
+    "",
+    "LVLI"
+  ],
+  "00091B": [
+    "ccBGSFO4044_LL_Armor_Power_Set_Partial",
+    "",
+    "LVLI"
+  ],
+  "00091A": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_BaseGame_Partial",
+    "",
+    "LVLI"
+  ],
+  "000919": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_Helmet_50",
+    "",
+    "LVLI"
+  ],
+  "000918": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_ArmLeft_50",
+    "",
+    "LVLI"
+  ],
+  "000917": [
+    "ccBGSFO4044_LL_Armor_Power_Hellfire_ArmRight_50",
+    "",
+    "LVLI"
+  ],
+  "00003C": [
+    "Commonwealth",
+    "Commonwealth",
+    "WRLD"
+  ],
+  "00086A": [
+    "ccBGSFO4044_Ref_HellfireBoss01",
+    "",
+    ""
+  ],
+  "000811": [
+    "ccBGSFO4044_HellfireSeedQuest",
+    "Hellfire Seed",
+    "QUST"
+  ],
+  "00086C": [
+    "ccBGSFO4044_HellfireBossKillQuest",
+    "Pyromaniac",
+    "QUST"
+  ],
+  "00086D": [
+    "ccBGSFO4044_LSArmorPowerArmor_Hellfire",
+    "",
+    "LSCR"
+  ],
+  "000912": [
+    "ccbgsFO4044HeadlampRedTactical",
+    "",
+    "ADDN"
+  ],
+  "000911": [
+    "ccbgsFO4044HeadlampPurple",
+    "",
+    "ADDN"
+  ],
+  "000913": [
+    "ccbgsFO4044HeadlampVaultBoy",
+    "",
+    "ADDN"
+  ],
+  "00090F": [
+    "ccbgsFO4044HeadlampBlue",
+    "",
+    "ADDN"
+  ],
+  "00090E": [
+    "ccbgsFO4044Headlamp",
+    "",
+    "ADDN"
+  ],
+  "000910": [
+    "ccbgsFO4044HeadlampBright",
+    "",
+    "ADDN"
+  ],
+  "00086E": [
+    "ccBGSFO4044_AA_Power_Leg_Right_Hellfire",
+    "",
+    "ARMA"
+  ],
+  "00086F": [
+    "ccBGSFO4044_AA_Power_Leg_Left_Hellfire",
+    "",
+    "ARMA"
+  ],
+  "002CF0": [
+    "CommonwealthLocation",
+    "",
+    "LCTN"
+  ],
+  "0008A0": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_F",
+    "",
+    "COBJ"
+  ],
+  "0008A1": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_BatRegen",
+    "",
+    "COBJ"
+  ],
+  "0008A2": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Cleanser",
+    "",
+    "COBJ"
+  ],
+  "0008A3": [
+    "ccBGSFO4044_co_Hellfire_ArmRight",
+    "",
+    "COBJ"
+  ],
+  "0008A4": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Emergency",
+    "",
+    "COBJ"
+  ],
+  "0008A5": [
+    "ccBGSFO4044_co_Hellfire_LegRight",
+    "",
+    "COBJ"
+  ],
+  "0008A6": [
+    "ccBGSFO4044_co_Hellfire_Torso",
+    "",
+    "COBJ"
+  ],
+  "0008A7": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_A",
+    "",
+    "COBJ"
+  ],
+  "0008A8": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_B",
+    "",
+    "COBJ"
+  ],
+  "0008A9": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_C",
+    "",
+    "COBJ"
+  ],
+  "0008AA": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_D",
+    "",
+    "COBJ"
+  ],
+  "0008AB": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_F",
+    "",
+    "COBJ"
+  ],
+  "0008AC": [
+    "ccBGSFO4044_co_Hellfire_Arm_Lining_E",
+    "",
+    "COBJ"
+  ],
+  "0008AD": [
+    "ccBGSFO4044_co_Hellfire_Arm_Misc_Bleed",
+    "",
+    "COBJ"
+  ],
+  "0008AE": [
+    "ccBGSFO4044_co_Hellfire_Material_EnclavePaint",
+    "",
+    "COBJ"
+  ],
+  "0008AF": [
+    "ccBGSFO4044_co_Hellfire_Arm_Misc_ShockDmg",
+    "",
+    "COBJ"
+  ],
+  "0008B0": [
+    "ccBGSFO4044_co_Hellfire_Arm_Misc_Optimized",
+    "",
+    "COBJ"
+  ],
+  "0008B1": [
+    "ccBGSFO4044_co_Hellfire_Arm_Misc_Unarmed",
+    "",
+    "COBJ"
+  ],
+  "0008B2": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp",
+    "",
+    "COBJ"
+  ],
+  "0008B3": [
+    "ccBGSFO4044_co_Hellfire_Material_Institute",
+    "",
+    "COBJ"
+  ],
+  "0008B4": [
+    "CCBGSFO4044_co_Hellfire_Material_BoSSentinal",
+    "",
+    "COBJ"
+  ],
+  "0008B5": [
+    "CCBGSFO4044_co_Hellfire_Material_BoSPaladin",
+    "",
+    "COBJ"
+  ],
+  "0008B6": [
+    "ccBGSFO4044_co_Hellfire_Material_Null",
+    "",
+    "COBJ"
+  ],
+  "0008B7": [
+    "CCBGSFO4044_co_Hellfire_Material_BoSKnight",
+    "",
+    "COBJ"
+  ],
+  "0008B8": [
+    "ccBGSFO4044_co_Hellfire_Material_Railroad",
+    "",
+    "COBJ"
+  ],
+  "0008B9": [
+    "ccBGSFO4044_co_Hellfire_Material_Minuteman",
+    "",
+    "COBJ"
+  ],
+  "0008BA": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp_Blue",
+    "",
+    "COBJ"
+  ],
+  "0008BB": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp_Bright",
+    "",
+    "COBJ"
+  ],
+  "000870": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp_Purple",
+    "",
+    "COBJ"
+  ],
+  "000871": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp_RedTactical",
+    "",
+    "COBJ"
+  ],
+  "000872": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Headlamp_VaultBoy",
+    "",
+    "COBJ"
+  ],
+  "000873": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_A",
+    "",
+    "COBJ"
+  ],
+  "000876": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_D",
+    "",
+    "COBJ"
+  ],
+  "000874": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_B",
+    "",
+    "COBJ"
+  ],
+  "000875": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_C",
+    "",
+    "COBJ"
+  ],
+  "000877": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_E",
+    "",
+    "COBJ"
+  ],
+  "00087E": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_VATSChance",
+    "",
+    "COBJ"
+  ],
+  "000878": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Lining_F",
+    "",
+    "COBJ"
+  ],
+  "000879": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_DetectLife",
+    "",
+    "COBJ"
+  ],
+  "00087A": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_Int",
+    "",
+    "COBJ"
+  ],
+  "00087B": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_RadScrubbers",
+    "",
+    "COBJ"
+  ],
+  "00087C": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_Recon",
+    "",
+    "COBJ"
+  ],
+  "00087D": [
+    "ccBGSFO4044_co_Hellfire_Helmet_Misc_Sensor",
+    "",
+    "COBJ"
+  ],
+  "00087F": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_A",
+    "",
+    "COBJ"
+  ],
+  "00088C": [
+    "ccBGSFO4044_co_Hellfire_Material_Explosives",
+    "",
+    "COBJ"
+  ],
+  "000880": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_B",
+    "",
+    "COBJ"
+  ],
+  "000881": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_C",
+    "",
+    "COBJ"
+  ],
+  "000882": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_D",
+    "",
+    "COBJ"
+  ],
+  "000883": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_E",
+    "",
+    "COBJ"
+  ],
+  "000884": [
+    "ccBGSFO4044_co_Hellfire_Leg_Lining_F",
+    "",
+    "COBJ"
+  ],
+  "000885": [
+    "ccBGSFO4044_co_Hellfire_Leg_Misc_APRegen",
+    "",
+    "COBJ"
+  ],
+  "000886": [
+    "ccBGSFO4044_co_Hellfire_Leg_Misc_Carry",
+    "",
+    "COBJ"
+  ],
+  "000887": [
+    "ccBGSFO4044_co_Hellfire_Leg_Misc_ExplVent",
+    "",
+    "COBJ"
+  ],
+  "000888": [
+    "ccBGSFO4044_co_Hellfire_Leg_Misc_OptimizedServos",
+    "",
+    "COBJ"
+  ],
+  "000889": [
+    "ccBGSFO4044_co_Hellfire_Leg_Misc_SprintBoost",
+    "",
+    "COBJ"
+  ],
+  "00088A": [
+    "ccBGSFO4044_co_Hellfire_Material_APSunRegen",
+    "",
+    "COBJ"
+  ],
+  "00088B": [
+    "ccBGSFO4044_co_Hellfire_Material_Energy",
+    "",
+    "COBJ"
+  ],
+  "00088D": [
+    "ccBGSFO4044_co_Hellfire_Material_Rad",
+    "",
+    "COBJ"
+  ],
+  "00088E": [
+    "ccBGSFO4044_co_Hellfire_Material_Shock",
+    "",
+    "COBJ"
+  ],
+  "000890": [
+    "ccBGSFO4044_co_Hellfire_Material_Titanium",
+    "",
+    "COBJ"
+  ],
+  "00088F": [
+    "ccBGSFO4044_co_Hellfire_Material_Thermal",
+    "",
+    "COBJ"
+  ],
+  "000891": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_A",
+    "",
+    "COBJ"
+  ],
+  "000892": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_B",
+    "",
+    "COBJ"
+  ],
+  "000894": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_D",
+    "",
+    "COBJ"
+  ],
+  "000893": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_C",
+    "",
+    "COBJ"
+  ],
+  "00089A": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_StealthBoy",
+    "",
+    "COBJ"
+  ],
+  "000899": [
+    "ccBGSFO4044_co_Hellfire_LegLeft",
+    "",
+    "COBJ"
+  ],
+  "00089B": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Reactive",
+    "",
+    "COBJ"
+  ],
+  "000895": [
+    "ccBGSFO4044_co_Hellfire_Torso_Lining_E",
+    "",
+    "COBJ"
+  ],
+  "000896": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Tesla",
+    "",
+    "COBJ"
+  ],
+  "000897": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Str",
+    "",
+    "COBJ"
+  ],
+  "000898": [
+    "ccBGSFO4044_co_Hellfire_Helm",
+    "",
+    "COBJ"
+  ],
+  "00089C": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_MedicPump",
+    "",
+    "COBJ"
+  ],
+  "00089D": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_Kinetic",
+    "",
+    "COBJ"
+  ],
+  "00089E": [
+    "ccBGSFO4044_co_Hellfire_Torso_Misc_JetPack",
+    "",
+    "COBJ"
+  ],
+  "00089F": [
+    "ccBGSFO4044_co_Hellfire_ArmLeft",
+    "",
+    "COBJ"
+  ],
+  "0008EC": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Reactive",
+    "Reactive Plates",
+    "OMOD"
+  ],
+  "0008ED": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_StealthBoy",
+    "Stealth Boy",
+    "OMOD"
+  ],
+  "0008EE": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Str",
+    "Motion-Assist Servos",
+    "OMOD"
+  ],
+  "0008EF": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Tesla",
+    "Tesla Coils",
+    "OMOD"
+  ],
+  "0008F0": [
+    "ccBGSFO4044_PA_Hellfire_Material_Null",
+    "No Material Mod",
+    "OMOD"
+  ],
+  "000808": [
+    "ccBGSFO4044_Power_Hellfire_LLeg",
+    "Standard Left Leg Lining",
+    "OMOD"
+  ],
+  "000809": [
+    "ccBGSFO4044_Power_Hellfire_LArm",
+    "Standard Left Arm Lining",
+    "OMOD"
+  ],
+  "00080A": [
+    "ccBGSFO4044_Power_Hellfire_Helmet",
+    "Standard Helmet Lining",
+    "OMOD"
+  ],
+  "0008F1": [
+    "ccBGSFO4044_PA_Hellfire_Material_Enclave",
+    "Enclave Paint",
+    "OMOD"
+  ],
+  "00080B": [
+    "ccBGSFO4044_Power_Hellfire_Torso",
+    "Standard Torso Lining",
+    "OMOD"
+  ],
+  "00080C": [
+    "ccBGSFO4044_Power_Hellfire_RLeg",
+    "Standard Right Leg Lining",
+    "OMOD"
+  ],
+  "00080D": [
+    "ccBGSFO4044_Power_Hellfire_RArm",
+    "Standard Right Arm Lining",
+    "OMOD"
+  ],
+  "0008F2": [
+    "ccBGSFO4044_PA_Hellfire_Material_Institute",
+    "Institute Paint",
+    "OMOD"
+  ],
+  "0008F3": [
+    "deletemedkjaldkajelinstu",
+    "Minuteman Paint",
+    "OMOD"
+  ],
+  "0008F4": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_VATSChance",
+    "VATS Matrix Overlay",
+    "OMOD"
+  ],
+  "0008F5": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_C",
+    "Mk.III",
+    "OMOD"
+  ],
+  "0008F6": [
+    "ccBGSFO4044_PA_Hellfire_Material_Minuteman",
+    "Minuteman Paint",
+    "OMOD"
+  ],
+  "0008F7": [
+    "ccBGSFO4044_PA_Hellfire_Material_BoSSentinel",
+    "BOS Sentinel Paint",
+    "OMOD"
+  ],
+  "0008F8": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_B",
+    "Mk.II",
+    "OMOD"
+  ],
+  "0008F9": [
+    "ccBGSFO4044_PA_Hellfire_Material_Railroad",
+    "Railroad Paint",
+    "OMOD"
+  ],
+  "0008FA": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_A",
+    "Mk.I",
+    "OMOD"
+  ],
+  "0008FB": [
+    "ccBGSFO4044_PA_Hellfire_Material_BoSPaladin",
+    "BOS Paladin Paint",
+    "OMOD"
+  ],
+  "0008FC": [
+    "ccBGSFO4044_PA_Hellfire_Material_BoSStandard",
+    "BOS Standard Paint",
+    "OMOD"
+  ],
+  "0008FD": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_JetPack",
+    "Jet Pack",
+    "OMOD"
+  ],
+  "0008FE": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_DetectLife",
+    "Targeting HUD",
+    "OMOD"
+  ],
+  "0008FF": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_Int",
+    "Internal Database",
+    "OMOD"
+  ],
+  "000900": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_Recon",
+    "Recon Sensors",
+    "OMOD"
+  ],
+  "000901": [
+    "ccBGSFO4044_PA_Hellfire_Material_BoSKnight",
+    "BOS Knight Paint",
+    "OMOD"
+  ],
+  "000902": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_D",
+    "Mk.IV",
+    "OMOD"
+  ],
+  "000903": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_E",
+    "Mk.V",
+    "OMOD"
+  ],
+  "0008BC": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Lining_F",
+    "Mk.VI",
+    "OMOD"
+  ],
+  "0008BD": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Misc_Bleed",
+    "Rusty Knuckles",
+    "OMOD"
+  ],
+  "0008BE": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Misc_Optimized",
+    "Optimized Bracers",
+    "OMOD"
+  ],
+  "0008BF": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Misc_ShockDmg",
+    "Tesla Bracers",
+    "OMOD"
+  ],
+  "0008C0": [
+    "ccBGSFO4044_PA_Hellfire_Arm_Misc_Unarmed",
+    "Hydraulic Bracers",
+    "OMOD"
+  ],
+  "0008C1": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp",
+    "Headlamp",
+    "OMOD"
+  ],
+  "0008C2": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp_Blue",
+    "Headlamp Blue",
+    "OMOD"
+  ],
+  "0008C3": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp_Bright",
+    "Headlamp Bright",
+    "OMOD"
+  ],
+  "0008C4": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp_Purple",
+    "Headlamp Purple",
+    "OMOD"
+  ],
+  "0008C5": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp_RedTactical",
+    "Headlamp Red Tactical",
+    "OMOD"
+  ],
+  "0008C6": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Headlamp_VaultBoy",
+    "Headlamp Vault Boy",
+    "OMOD"
+  ],
+  "0008C7": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_A",
+    "Mk.I",
+    "OMOD"
+  ],
+  "0008C8": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_B",
+    "Mk.II",
+    "OMOD"
+  ],
+  "0008C9": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_C",
+    "Mk.III",
+    "OMOD"
+  ],
+  "0008CA": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_D",
+    "Mk.IV",
+    "OMOD"
+  ],
+  "0008CB": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_E",
+    "Mk.V",
+    "OMOD"
+  ],
+  "0008CC": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Lining_F",
+    "Mk.VI",
+    "OMOD"
+  ],
+  "0008CD": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_RadScrubbers",
+    "Rad Scrubbers",
+    "OMOD"
+  ],
+  "0008CE": [
+    "ccBGSFO4044_PA_Hellfire_Helmet_Misc_Sensor",
+    "Sensor Array",
+    "OMOD"
+  ],
+  "0008CF": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_A",
+    "Mk.I",
+    "OMOD"
+  ],
+  "0008D0": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_B",
+    "Mk.II",
+    "OMOD"
+  ],
+  "0008D1": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_C",
+    "Mk.III",
+    "OMOD"
+  ],
+  "0008D2": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_D",
+    "Mk.IV",
+    "OMOD"
+  ],
+  "0008D3": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_E",
+    "Mk.V",
+    "OMOD"
+  ],
+  "0008D7": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Misc_ExplVent",
+    "Explosive Vent",
+    "OMOD"
+  ],
+  "0008D6": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Misc_Carry",
+    "Calibrated Shocks",
+    "OMOD"
+  ],
+  "0008D5": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Misc_APRegen",
+    "Kinetic Servos",
+    "OMOD"
+  ],
+  "0008D4": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Lining_F",
+    "Mk.VI",
+    "OMOD"
+  ],
+  "0008D8": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Misc_OptimizedServos",
+    "Optimized Servos",
+    "OMOD"
+  ],
+  "0008D9": [
+    "ccBGSFO4044_PA_Hellfire_Leg_Misc_SprintBoost",
+    "Overdrive Servos",
+    "OMOD"
+  ],
+  "0008DA": [
+    "ccBGSFO4044_PA_Hellfire_Material_APSunRegen",
+    "Photovoltaic Coating",
+    "OMOD"
+  ],
+  "0008DB": [
+    "ccBGSFO4044_PA_Hellfire_Material_Energy",
+    "Prism Shielding",
+    "OMOD"
+  ],
+  "0008DC": [
+    "ccBGSFO4044_PA_Hellfire_Material_Explosives",
+    "Explosive Shielding",
+    "OMOD"
+  ],
+  "0008DD": [
+    "ccBGSFO4044_PA_Hellfire_Material_Rad",
+    "Lead Plating",
+    "OMOD"
+  ],
+  "0008DE": [
+    "ccBGSFO4044_PA_Hellfire_Material_Shock",
+    "EMP Shielding",
+    "OMOD"
+  ],
+  "000006": [
+    "ccBGSFO4044_modcol_PA_Hellfire_Leg",
+    "",
+    "OMOD"
+  ],
+  "000005": [
+    "ccBGSFO4044_modcol_PA_Hellfire_Torso",
+    "",
+    "OMOD"
+  ],
+  "000004": [
+    "ccBGSFO4044_modcol_PA_Hellfire_Arm",
+    "",
+    "OMOD"
+  ],
+  "000003": [
+    "ccBGSFO4044_modcol_PA_Hellfire_Helmet",
+    "",
+    "OMOD"
+  ],
+  "0008DF": [
+    "ccBGSFO4044_PA_Hellfire_Material_Thermal",
+    "Thermal Coating",
+    "OMOD"
+  ],
+  "0008E0": [
+    "ccBGSFO4044_PA_Hellfire_Material_Titanium",
+    "Titanium Plating",
+    "OMOD"
+  ],
+  "0008E1": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_A",
+    "Mk.I",
+    "OMOD"
+  ],
+  "0008E2": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_B",
+    "Mk.II",
+    "OMOD"
+  ],
+  "0008E3": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_C",
+    "Mk.III",
+    "OMOD"
+  ],
+  "0008E4": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_D",
+    "Mk.IV",
+    "OMOD"
+  ],
+  "0008E5": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_E",
+    "Mk.V",
+    "OMOD"
+  ],
+  "0008E6": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Lining_F",
+    "Mk.VI",
+    "OMOD"
+  ],
+  "0008E7": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_BatRegen",
+    "Core Assembly",
+    "OMOD"
+  ],
+  "0008E8": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Cleanser",
+    "Blood Cleanser",
+    "OMOD"
+  ],
+  "0008E9": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Emergency",
+    "Emergency Protocols",
+    "OMOD"
+  ],
+  "0008EA": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_Kinetic",
+    "Kinetic Dynamo",
+    "OMOD"
+  ],
+  "0008EB": [
+    "ccBGSFO4044_PA_Hellfire_Torso_Misc_MedicPump",
+    "Medic Pump",
+    "OMOD"
+  ],
+  "000906": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_Minutemen",
+    "",
+    "MSWP"
+  ],
+  "000907": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_Institute",
+    "",
+    "MSWP"
+  ],
+  "000001": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_Enclave",
+    "",
+    "MSWP"
+  ],
+  "000909": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_BoSKnight",
+    "",
+    "MSWP"
+  ],
+  "000904": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_BoSPaladin",
+    "",
+    "MSWP"
+  ],
+  "000905": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_BoSSentinel",
+    "",
+    "MSWP"
+  ],
+  "000908": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_Energy",
+    "",
+    "MSWP"
+  ],
+  "00090A": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_Railroad",
+    "",
+    "MSWP"
+  ],
+  "00090C": [
+    "ccBGSFO4044_MSWP_PA_Hellfire_Material_ExplosiveShielding",
+    "",
+    "MSWP"
+  ]
+}
