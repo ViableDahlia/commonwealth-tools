@@ -1,9 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [Version 1.1]
 
 ### Added
 
+- **Creation Club plugin support**: 9 Next Gen CC plugins now indexed with RecordType data
+  - CC localised strings resolve via new `.strings.lookup.json` files
+  - Expandable record lists (click "+ X more" to toggle full content)
 - **Localised string resolution**: Plugin Viewer now fetches and resolves localised record names from `Fallout4.strings.lookup.json`, displaying actual in-game names instead of "(localised - unavailable)"
   - Automatically loads `Fallout4.strings.lookup.json` from GitHub on page load
   - Falls back gracefully when running locally (file://) or without network access
@@ -27,10 +30,16 @@
 
 ### Changed
 
+- `enrichNamesFromMasterIndices()` now loads CC strings lookups alongside master indices
 - `extractNames()` now captures `stringId` for localised records instead of boolean `localisedUnavailable` flag
 - `displayNameFor()` now attempts string resolution before falling back to EditorID or "(unnamed)"
 - `resolveBaseObjects()` now resolves REFR/ACHR base object names using string lookup when available
 - Record comparison logic updated to check for `stringId` presence instead of `localisedUnavailable` flag
+
+### Breaking Changes
+
+- **Local webserver now required**: Plugin Viewer no longer works with `file://` protocol due to cross-origin fetch for assets
+  - Use: `cd plugin-viewer && python3 -m http.server 8000` then open `http://localhost:8000`
 
 ### Technical
 
