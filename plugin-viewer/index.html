@@ -312,6 +312,7 @@ document.body.style.backgroundColor = '#050800';
 
 // Strings lookup for resolving localised names
 let stringsLookup = {};
+const ccStringsCache = {}; // CC plugin name -> {stringId: text} | null
 
 // Load strings lookup on initialization
 async function loadStringsLookup() {
@@ -324,6 +325,22 @@ async function loadStringsLookup() {
   } catch (e) {
     // Silently fail if running from file:// or network unavailable
     console.log('Strings lookup unavailable (running locally or no network access)');
+  }
+}
+
+async function loadCCStringsLookup(masterName){
+  if(masterName in ccStringsCache) return ccStringsCache[masterName];
+  try{
+    const baseName = masterName.replace(/\.(esl|esm|esp)$/i, '');
+    const url = `https://raw.githubusercontent.com/ViableDahlia/commonwealth-tools/main/plugin-viewer/assets/${encodeURIComponent(baseName)}.strings.lookup.json`;
+    const resp = await fetch(url);
+    if(!resp.ok){ ccStringsCache[masterName] = null; return null; }
+    const data = await resp.json();
+    ccStringsCache[masterName] = data;
+    return data;
+  } catch(err){
+    ccStringsCache[masterName] = null;
+    return null;
   }
 }
 
@@ -802,6 +819,7 @@ const RECORD_LABELS = {
   SNCT: 'Sound Concurrency',
   GDRY: 'Godrays',
   CAMS: 'Camera Shot',
+  ADDN: 'Addon Node',
 };
 function labelFor(sigStr){
   return RECORD_LABELS[sigStr] || `${sigStr} (unrecognised record type)`;
@@ -966,7 +984,7 @@ function lookupInMasterIndex(masterName, formID){
   const key = (formID & 0x00FFFFFF).toString(16).padStart(6, '0');
   const entry = idx[key];
   if(!entry) return null;
-  const [edid, full] = entry;
+  const [edid, full, recordType] = entry;
   return full || edid || null;
 }
 
@@ -976,6 +994,9 @@ async function enrichNamesFromMasterIndices(masterNames, plugins){
   enrichEl.textContent = `Checking for bundled vanilla/DLC name data for ${masterNames.length} master${masterNames.length>1?'s':''}...`;
 
   await Promise.all(masterNames.map(loadMasterIndex));
+  
+  // Also load CC strings lookups
+  await Promise.all(masterNames.map(m => m.startsWith('cc') ? loadCCStringsLookup(m) : Promise.resolve()));
 
   const foundFor = masterNames.filter(m => masterIndexCache[m]);
   if(foundFor.length === 0){
@@ -1224,7 +1245,12 @@ function displayNameFor(entry){
   
   // Try to resolve localised string
   if(entry.stringId !== null && entry.stringId !== undefined){
-    const resolvedText = stringsLookup[String(entry.stringId)];
+    // Try vanilla first
+    let resolvedText = stringsLookup[String(entry.stringId)];
+    // If not found and this is a CC record, try its strings lookup
+    if(!resolvedText && entry.masterName && ccStringsCache[entry.masterName]){
+      resolvedText = ccStringsCache[entry.masterName][String(entry.stringId)];
+    }
     if(resolvedText){
       return escapeHtml(resolvedText);
     }
@@ -1301,19 +1327,89 @@ function renderRecordGroups(records, containerEl, maxNamesPerGroup){
         return;
       }
 
+      // Separate named from unnamed/localised
+      const named = entries.filter(e => {
+        const name = displayNameFor(e);
+        return !name.includes('unnamed') && !name.includes('localised');
+      });
+      const unnamed = entries.filter(e => {
+        const name = displayNameFor(e);
+        return name.includes('unnamed') || name.includes('localised');
+      });
+
+      // Group unnamed/localised by masterName
+      const unnamedByMaster = {};
+      unnamed.forEach(e => {
+        const key = e.masterName || '(no override)';
+        if(!unnamedByMaster[key]) unnamedByMaster[key] = [];
+        unnamedByMaster[key].push(e);
+      });
+
       const namesEl = document.createElement('div');
       namesEl.className = 'content-names';
-      const shown = entries.slice(0, maxNamesPerGroup);
-      const parts = shown.map(e => {
+      const parts = [];
+
+      // Show named entries
+      const shownNamed = named.slice(0, maxNamesPerGroup);
+      shownNamed.forEach(e => {
         const nameHtml = displayNameFor(e);
         const masterTag = e.masterName ? ` <span class="master-tag">(overrides ${escapeHtml(e.masterName)})</span>` : '';
-        return nameHtml + masterTag;
+        parts.push(nameHtml + masterTag);
       });
-      if(entries.length > maxNamesPerGroup){
-        parts.push(`<span class="more">+ ${entries.length - maxNamesPerGroup} more</span>`);
+
+      // Show grouped unnamed/localised
+      Object.entries(unnamedByMaster).forEach(([master, items]) => {
+        const displayName = displayNameFor(items[0]);
+        const masterTag = master !== '(no override)' ? ` <span class="master-tag">(overrides ${escapeHtml(master)})</span>` : '';
+        if(items.length === 1){
+          parts.push(displayName + masterTag);
+        } else {
+          parts.push(`${items.length}x ${displayName}${masterTag}`);
+        }
+      });
+
+      // Handle "more" with expandable container
+      const totalShown = shownNamed.length + Object.keys(unnamedByMaster).length;
+      const hidden = entries.length - totalShown;
+      
+      let expandId = null;
+      if(hidden > 0){
+        expandId = `expand-${Math.random().toString(36).substr(2,9)}`;
+        const moreBtn = document.createElement('span');
+        moreBtn.className = 'more';
+        moreBtn.style.cursor = 'pointer';
+        moreBtn.textContent = `+ ${hidden} more`;
+        moreBtn.onclick = () => {
+          const expanded = document.getElementById(expandId);
+          expanded.style.display = expanded.style.display === 'none' ? 'block' : 'none';
+          moreBtn.textContent = expanded.style.display === 'none' ? `+ ${hidden} more` : `- ${hidden} more`;
+        };
+        namesEl.innerHTML = parts.join(', ');
+        namesEl.appendChild(moreBtn);
+
+        // Create hidden expansion container
+        const expandContainer = document.createElement('div');
+        expandContainer.id = expandId;
+        expandContainer.style.display = 'none';
+        expandContainer.style.marginTop = '8px';
+        expandContainer.style.paddingTop = '8px';
+        expandContainer.style.borderTop = '1px dotted var(--green-faint)';
+        
+        const hiddenParts = [];
+        const hiddenNamed = named.slice(maxNamesPerGroup);
+        hiddenNamed.forEach(e => {
+          const nameHtml = displayNameFor(e);
+          const masterTag = e.masterName ? ` <span class="master-tag">(overrides ${escapeHtml(e.masterName)})</span>` : '';
+          hiddenParts.push(nameHtml + masterTag);
+        });
+        
+        expandContainer.innerHTML = hiddenParts.join(', ');
+        wrap.appendChild(namesEl);
+        wrap.appendChild(expandContainer);
+      } else {
+        namesEl.innerHTML = parts.join(', ');
+        wrap.appendChild(namesEl);
       }
-      namesEl.innerHTML = parts.join(', ');
-      wrap.appendChild(namesEl);
 
       containerEl.appendChild(wrap);
     });
