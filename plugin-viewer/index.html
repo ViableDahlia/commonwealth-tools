@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" style="background-color:#050800;">
 <head>
+<link rel="icon" href="../assets/favicon.ico">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Viable Dahlia">
@@ -317,7 +318,7 @@ const ccStringsCache = {}; // CC plugin name -> {stringId: text} | null
 // Load strings lookup on initialization
 async function loadStringsLookup() {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/ViableDahlia/commonwealth-tools/main/plugin-viewer/assets/Fallout4.strings.lookup.json');
+    const response = await fetch(ASSET_BASE_PATH + 'Fallout4.strings.lookup.json');
     if (response.ok) {
       stringsLookup = await response.json();
       console.log(`Loaded ${Object.keys(stringsLookup).length} localised strings`);
@@ -332,7 +333,7 @@ async function loadCCStringsLookup(masterName){
   if(masterName in ccStringsCache) return ccStringsCache[masterName];
   try{
     const baseName = masterName.replace(/\.(esl|esm|esp)$/i, '');
-    const url = `https://raw.githubusercontent.com/ViableDahlia/commonwealth-tools/main/plugin-viewer/assets/${encodeURIComponent(baseName)}.strings.lookup.json`;
+    const url = ASSET_BASE_PATH + `${encodeURIComponent(baseName)}.strings.lookup.json`;
     const resp = await fetch(url);
     if(!resp.ok){ ccStringsCache[masterName] = null; return null; }
     const data = await resp.json();
@@ -961,7 +962,7 @@ async function handleFiles(files){
    the session so repeated files don't refetch. A missing index (e.g. for
    a mod master we haven't generated one for) is a normal, silent miss -
    not every master will have one, and that's fine. */
-const ASSET_BASE_PATH = 'assets/';
+const ASSET_BASE_PATH = '../assets/data/';
 const masterIndexCache = {}; // masterName -> {hexLocalId: [edid, full]} | null (fetch failed/404)
 
 async function loadMasterIndex(masterName){
