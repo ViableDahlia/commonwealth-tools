@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="../assets/favicon.ico">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="Viable Dahlia">
 <meta name="description" content="xEdit Conflict Analyser - Visualise plugin conflicts in your Fallout 4 load order">
-<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools/conflict-analyzer/index.html">
+<link rel="canonical" href="https://viabledahlia.github.io/commonwealth-tools/conflict-analyser/index.html">
 <title>XEDIT // CONFLICT ANALYSER // BETA</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
@@ -162,7 +161,7 @@ transition: all 0.2s;
 /* --- STATS BAR --- */
 .stats-bar {
 display: none;
-grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(4, 1fr);
 gap: 12px;
 margin-bottom: 20px;
 }
@@ -297,6 +296,7 @@ letter-spacing: 1px;
 
 .legend-winning { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.08); }
 .legend-losing { color: var(--amber); border-color: var(--amber); background: rgba(255,176,0,0.08); }
+.legend-reverts { color: var(--red); border-color: var(--red); background: rgba(255,68,68,0.1); }
 
 /* --- CONFLICT LIST --- */
 .conflict-list { display: none; }
@@ -411,6 +411,13 @@ white-space: nowrap;
 
 .badge-winning { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.08); }
 .badge-losing { color: var(--amber); border-color: var(--amber); background: rgba(255,176,0,0.08); }
+.badge-reverts { color: var(--red); border-color: var(--red); background: rgba(255,68,68,0.1); }
+.badge-master { color: var(--text-dim); border-color: var(--text-dim); background: transparent; }
+.row-master .conflict-plugin, .row-master .conflict-value { color: var(--text-dim); }
+.row-unchanged .conflict-value { color: var(--text-dim); }
+.same-note { color: var(--green-dim); font-style: italic; }
+.filter-toggle { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 1px; color: var(--red); cursor: pointer; user-select: none; }
+.filter-toggle input { accent-color: var(--red); }
 
 /* --- EMPTY STATE --- */
 .empty-state {
@@ -493,13 +500,18 @@ Expected format: <code>Isolated_Conflicts_Only.txt</code><br>
 <span class="stat-value" id="statPairs">0</span>
 <span class="stat-label">PLUGIN PAIRS</span>
 </div>
+<div class="stat-card">
+<span class="stat-value" id="statReverts" style="color:var(--red);text-shadow:0 0 10px rgba(255,68,68,0.5)">0</span>
+<span class="stat-label">REVERTED BY WINNER</span>
+</div>
 </div>
 
 <!-- CONTROLS -->
 <div class="controls" id="controls">
 <div class="search-wrap">
-<input type="text" id="searchInput" placeholder="SEARCH FORMID...">
+<input type="text" id="searchInput" placeholder="SEARCH FORMID, PLUGIN OR FIELD...">
 </div>
+<label class="filter-toggle"><input type="checkbox" id="revertsOnly"> REVERTS ONLY</label>
 <button class="reset-btn" onclick="resetTool()">✕ RESET</button>
 </div>
 
@@ -518,6 +530,13 @@ Showing <span id="resultCount">0</span> real conflicts
 <span class="legend-badge legend-losing">LOSING</span>
 <span>Plugin loads earlier (overridden)</span>
 </div>
+<div class="legend-item">
+<span class="legend-badge legend-reverts">REVERTS</span>
+<span>Winning plugin puts the master value back, undoing earlier changes</span>
+</div>
+<div class="legend-item">
+<span style="color:var(--text-dim)">+ added · − removed · <i>= master</i> unchanged</span>
+</div>
 </div>
 
 <!-- CONFLICT LIST -->
@@ -526,7 +545,7 @@ Showing <span id="resultCount">0</span> real conflicts
 <!-- EMPTY STATE -->
 <div class="empty-state" id="emptyState">
 <span class="empty-icon">◈</span>
-NO REAL CONFLICTS FOUND (ONLY [MISSING] ENTRIES)
+NO CONFLICTS MATCH
 </div>
 
 <!-- FOOTER -->
@@ -570,71 +589,129 @@ reader.onload = e => parseTSV(e.target.result, file.name);
 reader.readAsText(file);
 }
 
+const MASTER = '\u0000MASTER'; // comparison key for "same as master"
+
+function unquote(s) {
+return (s || '').trim().replace(/^"(.*)"$/s, '$1');
+}
+
 // --- PARSE TSV ---
 function parseTSV(text, filename) {
 const lines = text.split(/\r?\n/);
-const headers = lines[0].split('\t');
-
-const rawData = [];
-const pluginsSeen = [];
+const records = {}; // formid -> { master, chain: [], chainSeen: Set, rows: [] }
 
 for (let i = 1; i < lines.length; i++) {
-const line = lines[i].trim();
-if (!line) continue;
-
+const line = lines[i];
+if (!line.trim()) continue;
 const parts = line.split('\t');
-if (parts.length < 5) continue;
+if (parts.length < 3) continue;
 
+const formid = parts[0].trim();
 const plugin = parts[1].trim();
-if (!pluginsSeen.includes(plugin)) {
-pluginsSeen.push(plugin);
+const path = parts[2].trim();
+if (!records[formid]) records[formid] = { master: null, chain: [], chainSeen: new Set(), hasMarkers: false, rows: [] };
+const rec = records[formid];
+
+// Marker lines (script v1.10+): master plugin and every plugin in the override chain
+if (path === '[master]') { rec.master = plugin; continue; }
+if (path === '[override]') {
+if (!rec.hasMarkers) { rec.hasMarkers = true; rec.chain = []; rec.chainSeen = new Set(); }
+if (!rec.chainSeen.has(plugin)) { rec.chain.push(plugin); rec.chainSeen.add(plugin); }
+continue;
 }
 
-rawData.push({
-formid: parts[0].trim(),
-plugin: plugin,
-path: parts[2].trim(),
-masterValue: parts[3].trim().replace(/^"(.*)"$/s, '$1'),
-overridingValue: parts[4].trim().replace(/^"(.*)"$/s, '$1')
+// Older files have no markers: build the chain from the order plugins appear
+if (!rec.hasMarkers && !rec.chainSeen.has(plugin)) { rec.chain.push(plugin); rec.chainSeen.add(plugin); }
+
+rec.rows.push({ plugin, path, mv: unquote(parts[3]), ov: unquote(parts[4]) });
+}
+
+buildLoadOrder(records);
+analyseConflicts(records, filename);
+}
+
+// Work out a global load order from every record's override chain
+function buildLoadOrder(records) {
+const firstSeen = {}, after = {}, incoming = {};
+let n = 0;
+Object.values(records).forEach(rec => {
+rec.chain.forEach((p, i) => {
+if (!(p in firstSeen)) { firstSeen[p] = n++; after[p] = new Set(); incoming[p] = 0; }
+if (i > 0) {
+const prev = rec.chain[i - 1];
+if (!after[prev].has(p)) { after[prev].add(p); incoming[p]++; }
+}
 });
+});
+const ready = Object.keys(firstSeen).filter(p => incoming[p] === 0);
+const order = [];
+while (ready.length) {
+ready.sort((a, b) => firstSeen[a] - firstSeen[b]);
+const p = ready.shift();
+order.push(p);
+after[p].forEach(q => { if (--incoming[q] === 0) ready.push(q); });
 }
-
+// Anything left (inconsistent chains) goes on the end in first-seen order
+Object.keys(firstSeen).filter(p => !order.includes(p)).sort((a, b) => firstSeen[a] - firstSeen[b]).forEach(p => order.push(p));
 pluginLoadOrder = {};
-pluginsSeen.forEach((p, i) => {
-pluginLoadOrder[p] = i;
-});
+order.forEach((p, i) => { pluginLoadOrder[p] = i; });
+}
 
-analyseConflicts(rawData, filename);
+// Turn one plugin's rows for a field into a single display value
+function entryText(r) {
+if (r.ov === '[missing]') return r.mv ? '− ' + r.mv : '[missing]';
+if (r.mv === '') return '+ ' + r.ov;
+return r.ov;
 }
 
 // --- ANALYSE ---
-function analyseConflicts(rawData, filename) {
-const byRecordField = {};
-
-rawData.forEach(r => {
-if (r.overridingValue === '[missing]') return;
-
-const key = r.formid + '|' + r.path;
-if (!byRecordField[key]) {
-byRecordField[key] = { formid: r.formid, path: r.path, values: {}, lastPlugin: null };
-}
-byRecordField[key].values[r.plugin] = r.overridingValue;
-byRecordField[key].lastPlugin = r.plugin;
-});
-
+function analyseConflicts(records, filename) {
 allConflicts = [];
-Object.values(byRecordField).forEach(field => {
-const plugins = Object.keys(field.values);
-const uniqueValues = [...new Set(Object.values(field.values))];
 
-if (uniqueValues.length > 1) {
-allConflicts.push({
-formid: field.formid,
-path: field.path,
-pluginValues: field.values,
-winningPlugin: field.lastPlugin
+Object.keys(records).forEach(formid => {
+const rec = records[formid];
+const chain = rec.chain;
+if (chain.length === 0) return;
+const winner = chain[chain.length - 1];
+
+// Group rows by field, then by plugin
+const fields = {};
+rec.rows.forEach(r => {
+if (!fields[r.path]) fields[r.path] = {};
+if (!fields[r.path][r.plugin]) fields[r.path][r.plugin] = [];
+fields[r.path][r.plugin].push(r);
 });
+
+Object.keys(fields).forEach(path => {
+const byPlugin = fields[path];
+const allRows = Object.values(byPlugin).flat();
+
+// What the master holds for this field
+const normal = allRows.find(r => r.mv !== '' && r.ov !== '[missing]');
+const removals = allRows.filter(r => r.ov === '[missing]');
+const isList = Object.values(byPlugin).some(rs => rs.length > 1);
+let masterText;
+if (normal && !isList) masterText = normal.mv;
+else if (removals.length === 0 && !isList) masterText = '[not present]';
+else if (!isList && new Set(removals.map(r => r.mv)).size === 1) masterText = removals[0].mv;
+else masterText = '(original list)';
+
+// Each plugin's value; plugins with no rows still hold the master value
+const keys = {}, display = {};
+chain.forEach(p => {
+const rs = byPlugin[p];
+if (!rs) { keys[p] = MASTER; display[p] = masterText; return; }
+const txt = rs.map(entryText).sort().join('\n');
+keys[p] = txt; display[p] = txt;
+});
+
+const changed = new Set(chain.map(p => keys[p]).filter(k => k !== MASTER));
+const reverts = keys[winner] === MASTER;
+// True conflict: overrides disagree, or the winner puts the master value back
+if (changed.size >= 2 || (changed.size === 1 && reverts)) {
+allConflicts.push({ formid, path, master: rec.master, masterText, chain, keys, display, winner, reverts });
 }
+});
 });
 
 document.getElementById('footerFile').textContent = `FILE: ${filename} · ${allConflicts.length} TRUE CONFLICTS FOUND`;
@@ -648,10 +725,13 @@ const uniqueRecords = new Set(allConflicts.map(c => c.formid)).size;
 const pluginPairs = new Set();
 
 allConflicts.forEach(c => {
-const plugins = Object.keys(c.pluginValues).sort((a, b) => pluginLoadOrder[a] - pluginLoadOrder[b]);
-for (let i = 0; i < plugins.length; i++) {
-for (let j = i + 1; j < plugins.length; j++) {
-pluginPairs.add(plugins[i] + ' ↔ ' + plugins[j]);
+const involved = c.chain.filter(p => c.keys[p] !== MASTER || p === c.winner);
+for (let i = 0; i < involved.length; i++) {
+for (let j = i + 1; j < involved.length; j++) {
+if (c.keys[involved[i]] !== c.keys[involved[j]]) {
+const pair = [involved[i], involved[j]].sort((a, b) => pluginLoadOrder[a] - pluginLoadOrder[b]);
+pluginPairs.add(pair[0] + ' ↔ ' + pair[1]);
+}
 }
 }
 });
@@ -659,6 +739,7 @@ pluginPairs.add(plugins[i] + ' ↔ ' + plugins[j]);
 document.getElementById('statConflicts').textContent = allConflicts.length;
 document.getElementById('statRecords').textContent = uniqueRecords;
 document.getElementById('statPairs').textContent = pluginPairs.size;
+document.getElementById('statReverts').textContent = allConflicts.filter(c => c.reverts).length;
 }
 
 function showUI() {
@@ -674,6 +755,7 @@ function resetTool() {
 allConflicts = [];
 pluginLoadOrder = {};
 document.getElementById('searchInput').value = '';
+document.getElementById('revertsOnly').checked = false;
 document.getElementById('footerFile').textContent = 'NO FILE LOADED';
 document.getElementById('fileInput').value = '';
 document.getElementById('dropZone').style.display = 'block';
@@ -687,10 +769,15 @@ document.getElementById('emptyState').style.display = 'none';
 
 // --- SEARCH & RENDER ---
 document.getElementById('searchInput').addEventListener('input', renderConflicts);
+document.getElementById('revertsOnly').addEventListener('change', renderConflicts);
 
 function renderConflicts() {
 const query = document.getElementById('searchInput').value.toLowerCase().trim();
-const filtered = allConflicts.filter(c => c.formid.toLowerCase().includes(query));
+const revertsOnly = document.getElementById('revertsOnly').checked;
+const filtered = allConflicts.filter(c =>
+(!revertsOnly || c.reverts) &&
+(!query || c.formid.toLowerCase().includes(query) || c.path.toLowerCase().includes(query) ||
+c.chain.some(p => p.toLowerCase().includes(query))));
 
 document.getElementById('resultCount').textContent = filtered.length;
 
@@ -701,6 +788,7 @@ return;
 }
 
 document.getElementById('emptyState').style.display = 'none';
+document.getElementById('conflictList').style.display = 'block';
 
 const byRecord = {};
 filtered.forEach(c => {
@@ -712,37 +800,40 @@ let html = '';
 Object.keys(byRecord).sort().forEach(formid => {
 const conflicts = byRecord[formid];
 const recordId = 'record-' + formid;
+const revertCount = conflicts.filter(c => c.reverts).length;
 
 html += `
 <div class="record-group">
 <div class="record-header" onclick="toggleRecord('${recordId}')">
 <span class="record-toggle" id="${recordId}-toggle">▶</span>
-<span class="record-id">${formid}</span>
+<span class="record-id">${escapeHtml(formid)}</span>
+${revertCount ? `<span class="status-badge badge-reverts">${revertCount} REVERTED</span>` : ''}
 <span class="record-count">${conflicts.length} field${conflicts.length !== 1 ? 's' : ''}</span>
 </div>
 <div class="conflicts-container" id="${recordId}">
-${conflicts.map(c => {
-const plugins = Object.keys(c.pluginValues).sort((a, b) => pluginLoadOrder[a] - pluginLoadOrder[b]);
-return `
+${conflicts.map(c => `
 <div style="border-bottom: 1px solid rgba(30,58,10,0.5); padding: 12px 16px;">
-<div class="conflict-field">${c.path}</div>
-${plugins.map((p, idx) => {
-const isWinning = p === c.winningPlugin;
-const statusBadge = isWinning ? 'badge-winning' : 'badge-losing';
-const statusText = isWinning ? 'WINNING' : 'LOSING';
-const pos = pluginLoadOrder[p];
+<div class="conflict-field">${escapeHtml(c.path)}</div>
+<div class="conflict-row row-master">
+<div class="conflict-position">MSTR</div>
+<div class="conflict-plugin">${escapeHtml(c.master || 'Master')}</div>
+<div class="conflict-value">${escapeHtml(c.masterText)}</div>
+<span class="status-badge badge-master">MASTER</span>
+</div>
+${c.chain.map(p => {
+const isWinning = p === c.winner;
+const same = c.keys[p] === MASTER;
+let badge = isWinning ? (c.reverts ? 'badge-reverts' : 'badge-winning') : 'badge-losing';
+let text = isWinning ? (c.reverts ? 'REVERTS' : 'WINNING') : 'LOSING';
 return `
-<div class="conflict-row">
-<div class="conflict-position">#${pos + 1}</div>
-<div class="conflict-plugin">${p}</div>
-<div class="conflict-value">${escapeHtml(c.pluginValues[p])}</div>
-<span class="status-badge ${statusBadge}">${statusText}</span>
-</div>
-`;
+<div class="conflict-row${same ? ' row-unchanged' : ''}">
+<div class="conflict-position">#${pluginLoadOrder[p] + 1}</div>
+<div class="conflict-plugin">${escapeHtml(p)}</div>
+<div class="conflict-value">${same ? '<span class="same-note">= master</span> ' : ''}${escapeHtml(c.display[p])}</div>
+<span class="status-badge ${badge}">${text}</span>
+</div>`;
 }).join('')}
-</div>
-`;
-}).join('')}
+</div>`).join('')}
 </div>
 </div>
 `;
@@ -754,15 +845,16 @@ document.getElementById('conflictList').innerHTML = html;
 function toggleRecord(id) {
 const container = document.getElementById(id);
 const toggle = document.getElementById(id + '-toggle');
-const isHidden = container.style.display === 'none';
+const isHidden = getComputedStyle(container).display === 'none';
 container.style.display = isHidden ? 'block' : 'none';
-toggle.style.transform = isHidden ? 'rotate(0)' : 'rotate(90deg)';
+toggle.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0)';
 }
 
 function escapeHtml(s) {
-return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
+
 
 </body>
 </html>
