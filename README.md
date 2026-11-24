@@ -56,6 +56,18 @@ Works fully offline once loaded, no installation or upload required - the file n
 
 ---
 
+### [Crash Resolver](https://github.com/ViableDahlia/commonwealth-tools/blob/main/crash-resolver)
+
+Drop in a Fallout 4 Addictol crash log and get a plain-language explanation of what the game was doing when it crashed, the evidence behind it, and what to try first. Add an optional description (such as a forum post) to check its claims against the log, then copy a path-free summary to paste into a reply.
+
+Runs entirely in your browser - nothing is uploaded. Currently reads Addictol logs only; Buffout 4 support and load order checks are planned.
+
+**[Open tool →](https://viabledahlia.github.io/commonwealth-tools/crash-resolver/)**
+
+> 🧪 **First release (level 1, crash log only).** Results are being stress-tested against more crash types. Please report anything that looks wrong or too confident, with the relevant log lines.
+
+---
+
 ## About
 
 Made by **Viable Dahlia**, a Fallout 4 settlement builder focused on architectural approaches to in-game construction, inspired by [Gemma Wheeler Architecture](https://youtube.com/@gemmawheeler).
@@ -75,5 +87,6 @@ Code in this repository is licensed on a per-tool basis.
 | Nexus Tracker Enhanced                 | [MIT](https://github.com/ViableDahlia/commonwealth-tools/blob/main/nexus-tracker-enhanced/LICENSE)                      |
 | VD Conflict Analyser                   | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                                                                |
 | Plugin Viewer                          | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (bundles [pako](https://github.com/nodeca/pako), MIT licensed) |
+| Crash Resolver                         | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                                                                |
 
 See each tool's folder for its individual licence file.
