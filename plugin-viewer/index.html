@@ -982,7 +982,7 @@ async function loadMasterIndex(masterName){
 function lookupInMasterIndex(masterName, formID){
   const idx = masterIndexCache[masterName];
   if(!idx) return null;
-  const key = (formID & 0x00FFFFFF).toString(16).padStart(6, '0');
+  const key = (formID & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
   const entry = idx[key];
   if(!entry) return null;
   const [edid, full, recordType] = entry;
